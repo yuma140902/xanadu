@@ -1,15 +1,13 @@
 use std::alloc::Layout;
 
-const MAX_COMPONENTS: usize = 32;
-
 #[derive(Debug)]
 pub struct ComponentArray {
     ptr: *mut u8,
     layout: Layout,
     len: usize,
     type_id: std::any::TypeId,
-    #[cfg_attr(not(debug_assertions), allow(dead_code))]
     element_size: usize,
+    capacity: usize,
 }
 
 impl ComponentArray {
@@ -24,7 +22,8 @@ impl ComponentArray {
         let type_id = std::any::TypeId::of::<T>();
         let alignment = std::mem::align_of::<T>();
         let size = std::mem::size_of::<T>();
-        let layout = Layout::from_size_align(MAX_COMPONENTS * size, alignment).unwrap();
+        let capacity = 0;
+        let layout = Layout::from_size_align(capacity * size, alignment).unwrap();
         let ptr = unsafe {
             let ptr = std::alloc::alloc(layout);
             assert!(!ptr.is_null(), "Failed to allocate memory");
@@ -36,6 +35,7 @@ impl ComponentArray {
             layout,
             len: 0,
             element_size: size,
+            capacity,
         }
     }
 
@@ -51,11 +51,33 @@ impl ComponentArray {
         self.type_id
     }
 
+    /// 要素を追加する。必要に応じてメモリを再確保する。
+    ///
     /// ## Safety
     ///
     /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
-    pub unsafe fn add_unchecked<T>(&mut self, value: T) {
-        // TODO: サイズをチェックしてreallocまたはpanicする
+    ///
+    /// ## Panics
+    ///
+    /// - メモリ確保に失敗した場合にpanicする
+    /// - `T`が[`Layout::from_size_align()`]の事前条件を満たさなかった場合にpanicする
+    pub unsafe fn add_unchecked<T: bytemuck::Pod>(&mut self, value: T) {
+        if self.len >= self.capacity {
+            println!("realloc");
+            let new_capacity = if self.capacity == 0 {
+                1
+            } else {
+                self.capacity * 2
+            };
+            let new_layout =
+                Layout::from_size_align(new_capacity * self.element_size, self.layout.align())
+                    .unwrap();
+            let new_ptr = std::alloc::realloc(self.ptr, self.layout, new_layout.size());
+            assert!(!new_ptr.is_null(), "Failed to reallocate memory");
+            self.ptr = new_ptr;
+            self.layout = new_layout;
+            self.capacity = new_capacity;
+        }
         let index = self.len;
         self.len += 1;
         let ptr = self.get_ptr::<T>(index);
@@ -66,7 +88,7 @@ impl ComponentArray {
     ///
     /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
-    pub unsafe fn get_ptr<T>(&self, index: usize) -> *mut T {
+    pub unsafe fn get_ptr<T: bytemuck::Pod>(&self, index: usize) -> *mut T {
         let ptr = self.ptr.cast::<T>();
         ptr.add(index)
     }
@@ -75,7 +97,7 @@ impl ComponentArray {
     ///
     /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
-    pub unsafe fn get_unchecked<T>(&self, index: usize) -> &T {
+    pub unsafe fn get_unchecked<T: bytemuck::Pod>(&self, index: usize) -> &T {
         &*self.get_ptr(index)
     }
 
@@ -83,28 +105,33 @@ impl ComponentArray {
     ///
     /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
-    pub unsafe fn get_mut_unchecked<T>(&mut self, index: usize) -> &mut T {
+    pub unsafe fn get_mut_unchecked<T: bytemuck::Pod>(&mut self, index: usize) -> &mut T {
         &mut *self.get_ptr(index)
     }
 
+    /// 要素を追加する。必要に応じてメモリを再確保する。
+    ///
     /// ## Panics
     ///
     /// `T`が[`Self::new()`]で指定した型に一致しなかった場合にpanicする
-    pub fn add<T: 'static>(&mut self, value: T) {
+    pub fn add<T: bytemuck::Pod>(&mut self, value: T)
+    where
+        T: Sized + bytemuck::Pod + Default,
+    {
         assert!(self.type_id == std::any::TypeId::of::<T>(), "Type mismatch");
         unsafe {
             self.add_unchecked(value);
         }
     }
 
-    pub fn get<T: 'static>(&self, index: usize) -> Option<&T> {
+    pub fn get<T: bytemuck::Pod>(&self, index: usize) -> Option<&T> {
         if index >= self.len || self.type_id != std::any::TypeId::of::<T>() {
             return None;
         }
         unsafe { Some(self.get_unchecked(index)) }
     }
 
-    pub fn get_mut<T: 'static>(&mut self, index: usize) -> Option<&mut T> {
+    pub fn get_mut<T: bytemuck::Pod>(&mut self, index: usize) -> Option<&mut T> {
         if index >= self.len || self.type_id != std::any::TypeId::of::<T>() {
             return None;
         }
