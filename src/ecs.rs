@@ -15,14 +15,18 @@ impl ComponentArray {
     ///
     /// - メモリ確保に失敗した場合にpanicする
     /// - `T`が[`Layout::from_size_align()`]の事前条件を満たさなかった場合にpanicする
-    pub fn new<T>() -> Self
-    where
-        T: Sized + bytemuck::Pod + Default,
-    {
+    pub fn new<T: bytemuck::Pod>() -> Self {
+        Self::with_capacity::<T>(0)
+    }
+
+    /// ## Panics
+    ///
+    /// - メモリ確保に失敗した場合にpanicする
+    /// - `T`が[`Layout::from_size_align()`]の事前条件を満たさなかった場合にpanicする
+    pub fn with_capacity<T: bytemuck::Pod>(capacity: usize) -> Self {
         let type_id = std::any::TypeId::of::<T>();
         let alignment = std::mem::align_of::<T>();
         let size = std::mem::size_of::<T>();
-        let capacity = 0;
         let layout = Layout::from_size_align(capacity * size, alignment).unwrap();
         let ptr = unsafe {
             let ptr = std::alloc::alloc(layout);
@@ -55,7 +59,7 @@ impl ComponentArray {
     ///
     /// ## Safety
     ///
-    /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
+    /// - `T`はインスタンスの生成時に指定した型と同じでなければならない
     ///
     /// ## Panics
     ///
@@ -86,7 +90,7 @@ impl ComponentArray {
 
     /// ## Safety
     ///
-    /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
+    /// - `T`はインスタンスの生成時に指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
     pub unsafe fn get_ptr<T: bytemuck::Pod>(&self, index: usize) -> *mut T {
         let ptr = self.ptr.cast::<T>();
@@ -95,7 +99,7 @@ impl ComponentArray {
 
     /// ## Safety
     ///
-    /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
+    /// - `T`はインスタンスの生成時に指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
     pub unsafe fn get_unchecked<T: bytemuck::Pod>(&self, index: usize) -> &T {
         &*self.get_ptr(index)
@@ -103,7 +107,7 @@ impl ComponentArray {
 
     /// ## Safety
     ///
-    /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
+    /// - `T`はインスタンスの生成時に指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
     pub unsafe fn get_mut_unchecked<T: bytemuck::Pod>(&mut self, index: usize) -> &mut T {
         &mut *self.get_ptr(index)
@@ -113,7 +117,7 @@ impl ComponentArray {
     ///
     /// ## Panics
     ///
-    /// `T`が[`Self::new()`]で指定した型に一致しなかった場合にpanicする
+    /// `T`がインスタンスの生成時に指定した型と一致しなかった場合にpanicする
     pub fn add<T: bytemuck::Pod>(&mut self, value: T)
     where
         T: Sized + bytemuck::Pod + Default,
@@ -165,6 +169,12 @@ mod test {
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn new() {
         let _ = ComponentArray::new::<u32>();
+    }
+
+    #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+    fn with_capacity() {
+        let _ = ComponentArray::with_capacity::<u32>(10);
     }
 
     #[repr(C)]
