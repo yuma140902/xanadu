@@ -418,4 +418,52 @@ mod test {
         let elem = ca.get::<f64>(0);
         assert_eq!(elem, None);
     }
+
+    #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+    fn multiple_array() {
+        let mut c1 = ComponentArray::new::<Position>();
+        let mut c2 = ComponentArray::new::<Position>();
+
+        c1.add(Position {
+            x: 1.0,
+            y: 2.0,
+            z: 3.0,
+        });
+
+        c2.add(Position {
+            x: 4.0,
+            y: 5.0,
+            z: 6.0,
+        });
+
+        let elem1 = c1.get::<Position>(0);
+        assert_eq!(
+            elem1,
+            Some(&Position {
+                x: 1.0,
+                y: 2.0,
+                z: 3.0
+            })
+        );
+
+        let elem2 = c2.get::<Position>(0);
+        assert_eq!(
+            elem2,
+            Some(&Position {
+                x: 4.0,
+                y: 5.0,
+                z: 6.0
+            })
+        );
+    }
+
+    #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
+    fn empty_type() {
+        let mut ca = ComponentArray::new::<()>();
+        ca.add(());
+        let elem = ca.get::<()>(0);
+        assert_eq!(elem, Some(&()));
+    }
 }
