@@ -27,7 +27,8 @@ impl ComponentArray {
         let type_id = std::any::TypeId::of::<T>();
         let alignment = std::mem::align_of::<T>();
         let size = std::mem::size_of::<T>();
-        let layout = Layout::from_size_align(capacity * size, alignment).unwrap();
+        let alloc_size = (capacity * size).max(alignment).max(1);
+        let layout = Layout::from_size_align(alloc_size, alignment).unwrap();
         let ptr = unsafe {
             let ptr = std::alloc::alloc(layout);
             assert!(!ptr.is_null(), "Failed to allocate memory");
@@ -73,9 +74,11 @@ impl ComponentArray {
             } else {
                 self.capacity * 2
             };
-            let new_layout =
-                Layout::from_size_align(new_capacity * self.element_size, self.layout.align())
-                    .unwrap();
+            let new_alloc_size = (new_capacity * self.element_size)
+                .max(self.layout.align())
+                .max(self.layout.size())
+                .max(1);
+            let new_layout = Layout::from_size_align(new_alloc_size, self.layout.align()).unwrap();
             let new_ptr = std::alloc::realloc(self.ptr, self.layout, new_layout.size());
             assert!(!new_ptr.is_null(), "Failed to reallocate memory");
             self.ptr = new_ptr;
