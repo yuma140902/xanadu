@@ -69,3 +69,20 @@ jobs:
     - run: wasm-pack test --headless --firefox -- --features test_in_browser --verbose --release
     - run: wasm-pack test --headless --chrome -- --features test_in_browser --verbose
     - run: wasm-pack test --headless --chrome -- --features test_in_browser --verbose --release
+
+  tests-arm64:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: repo
+    - uses: docker/setup-qemu-action@v3
+      with:
+        platforms: arm64
+    - run: |
+        docker run --rm -i -v $PWD:/app arm64v8/rust:slim-buster bash <<'EOF'
+        set -xeu
+        cd /app/repo
+        cargo test --color=always --verbose
+        cargo test --color=always --verbose --release
+        EOF
