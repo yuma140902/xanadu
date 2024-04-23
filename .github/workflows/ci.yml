@@ -73,3 +73,14 @@ jobs:
     - run: wasm-pack test --headless --firefox -- --features test_in_browser --verbose --release
     - run: wasm-pack test --headless --chrome -- --features test_in_browser --verbose
     - run: wasm-pack test --headless --chrome -- --features test_in_browser --verbose --release
+
+  miri:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@nightly
+      with:
+        components: miri,rust-src
+    - run: cargo +nightly miri test --verbose
+    # miri does not support optimizations.
+    #- run: cargo +nightly miri test --verbose --release
