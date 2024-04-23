@@ -118,10 +118,7 @@ impl ComponentArray {
     /// ## Panics
     ///
     /// `T`がインスタンスの生成時に指定した型と一致しなかった場合にpanicする
-    pub fn add<T: bytemuck::Pod>(&mut self, value: T)
-    where
-        T: Sized + bytemuck::Pod + Default,
-    {
+    pub fn add<T: bytemuck::Pod>(&mut self, value: T) {
         assert!(self.type_id == std::any::TypeId::of::<T>(), "Type mismatch");
         unsafe {
             self.add_unchecked(value);
