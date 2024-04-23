@@ -8,10 +8,15 @@ pub struct ComponentArray {
     layout: Layout,
     len: usize,
     type_id: std::any::TypeId,
+    #[cfg_attr(not(debug_assertions), allow(dead_code))]
     element_size: usize,
 }
 
 impl ComponentArray {
+    /// ## Panics
+    ///
+    /// - メモリ確保に失敗した場合にpanicする
+    /// - `T`が[`Layout::from_size_align()`]の事前条件を満たさなかった場合にpanicする
     pub fn new<T>() -> Self
     where
         T: Sized + bytemuck::Pod + Default,
@@ -22,9 +27,7 @@ impl ComponentArray {
         let layout = Layout::from_size_align(MAX_COMPONENTS * size, alignment).unwrap();
         let ptr = unsafe {
             let ptr = std::alloc::alloc(layout);
-            if ptr.is_null() {
-                panic!("Failed to allocate memory");
-            }
+            assert!(!ptr.is_null(), "Failed to allocate memory");
             ptr
         };
         Self {
@@ -50,7 +53,7 @@ impl ComponentArray {
 
     /// ## Safety
     ///
-    /// - `T`はnewで指定した型と同じでなければならない
+    /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
     pub unsafe fn add_unchecked<T>(&mut self, value: T) {
         // TODO: サイズをチェックしてreallocまたはpanicする
         let index = self.len;
@@ -61,16 +64,16 @@ impl ComponentArray {
 
     /// ## Safety
     ///
-    /// - `T`はnewで指定した型と同じでなければならない
+    /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
     pub unsafe fn get_ptr<T>(&self, index: usize) -> *mut T {
-        let ptr = self.ptr as *mut T;
+        let ptr = self.ptr.cast::<T>();
         ptr.add(index)
     }
 
     /// ## Safety
     ///
-    /// - `T`はnewで指定した型と同じでなければならない
+    /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
     pub unsafe fn get_unchecked<T>(&self, index: usize) -> &T {
         &*self.get_ptr(index)
@@ -78,16 +81,17 @@ impl ComponentArray {
 
     /// ## Safety
     ///
-    /// - `T`はnewで指定した型と同じでなければならない
+    /// - `T`は[`Self::new()`]で指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
     pub unsafe fn get_mut_unchecked<T>(&mut self, index: usize) -> &mut T {
         &mut *self.get_ptr(index)
     }
 
+    /// ## Panics
+    ///
+    /// `T`が[`Self::new()`]で指定した型に一致しなかった場合にpanicする
     pub fn add<T: 'static>(&mut self, value: T) {
-        if self.type_id != std::any::TypeId::of::<T>() {
-            panic!("Type mismatch");
-        }
+        assert!(self.type_id == std::any::TypeId::of::<T>(), "Type mismatch");
         unsafe {
             self.add_unchecked(value);
         }
