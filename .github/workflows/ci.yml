@@ -78,7 +78,7 @@ jobs:
         path: repo
     - uses: docker/setup-qemu-action@v3
       with:
-        platforms: arm64
+        platforms: all
     - run: |
         docker run --rm -i -v $PWD:/app arm64v8/rust:slim-buster bash <<'EOF'
         set -xeu
