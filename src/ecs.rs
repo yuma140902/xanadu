@@ -124,8 +124,14 @@ impl Drop for ComponentArray {
 #[cfg(test)]
 mod test {
     use super::*;
+    #[cfg(target_arch = "wasm32")]
+    use wasm_bindgen_test::*;
+
+    #[cfg(all(target_arch = "wasm32", feature = "test_in_browser"))]
+    wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn new() {
         let _ = ComponentArray::new::<u32>();
     }
@@ -139,6 +145,7 @@ mod test {
     }
 
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get_unsafe() {
         let mut ca = ComponentArray::new::<Position>();
 
@@ -176,6 +183,7 @@ mod test {
     }
 
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get() {
         let mut ca = ComponentArray::new::<Position>();
 
@@ -211,6 +219,7 @@ mod test {
     }
 
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get_mut_field_unsafe() {
         let mut ca = ComponentArray::new::<Position>();
 
@@ -242,6 +251,7 @@ mod test {
     }
 
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get_mut_self_unsafe() {
         let mut ca = ComponentArray::new::<Position>();
 
@@ -278,6 +288,7 @@ mod test {
     }
 
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get_mut_field() {
         let mut ca = ComponentArray::new::<Position>();
 
@@ -307,6 +318,7 @@ mod test {
     }
 
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get_mut_self() {
         let mut ca = ComponentArray::new::<Position>();
 
@@ -341,6 +353,7 @@ mod test {
     }
 
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn get_out_of_range() {
         let mut ca = ComponentArray::new::<Position>();
         ca.add(Position {
@@ -353,6 +366,7 @@ mod test {
     }
 
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn get_wrong_type() {
         let mut ca = ComponentArray::new::<Position>();
         ca.add(Position {
