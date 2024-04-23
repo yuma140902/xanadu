@@ -175,4 +175,20 @@ mod test {
         assert_eq!(v.len(), 4);
         assert_eq!(v.entries.len(), 4);
     }
+
+    #[test]
+    fn len() {
+        let v = GenerationalVec::<()>::new();
+        assert_eq!(v.len(), 0);
+        assert!(v.is_empty());
+    }
+
+    #[test]
+    fn empty_after_remove() {
+        let mut v = GenerationalVec::new();
+        let id = v.add(100);
+        assert!(!v.is_empty());
+        v.remove(id);
+        assert!(v.is_empty());
+    }
 }
