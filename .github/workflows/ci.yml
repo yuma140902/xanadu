@@ -17,6 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
+    - run: rustc --print=cfg
     - run: cargo build --verbose
     - run: cargo build --verbose --release
 
@@ -43,6 +44,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
+    - run: rustc --print=cfg
     - run: cargo test --verbose
     - run: cargo test --verbose --release
 
