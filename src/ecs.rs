@@ -1,8 +1,8 @@
-use std::alloc::Layout;
+use std::{alloc::Layout, ptr::NonNull};
 
 #[derive(Debug)]
 pub struct ComponentArray {
-    ptr: *mut u8,
+    ptr: NonNull<u8>,
     layout: Layout,
     len: usize,
     type_id: std::any::TypeId,
@@ -13,7 +13,7 @@ pub struct ComponentArray {
 impl ComponentArray {
     /// ## Panics
     ///
-    /// - メモリ確保に失敗した場合にpanicする
+    /// - アロケーターがnullを返した場合にpanicする
     /// - `T`が[`Layout::from_size_align()`]の事前条件を満たさなかった場合にpanicする
     pub fn new<T: bytemuck::Pod>() -> Self {
         Self::with_capacity::<T>(0)
@@ -21,7 +21,7 @@ impl ComponentArray {
 
     /// ## Panics
     ///
-    /// - メモリ確保に失敗した場合にpanicする
+    /// - アロケーターがnullを返した場合にpanicする
     /// - `T`が[`Layout::from_size_align()`]の事前条件を満たさなかった場合にpanicする
     pub fn with_capacity<T: bytemuck::Pod>(capacity: usize) -> Self {
         let type_id = std::any::TypeId::of::<T>();
@@ -31,8 +31,7 @@ impl ComponentArray {
         let layout = Layout::from_size_align(alloc_size, alignment).unwrap();
         let ptr = unsafe {
             let ptr = std::alloc::alloc(layout);
-            assert!(!ptr.is_null(), "Failed to allocate memory");
-            ptr
+            NonNull::new(ptr).expect("Failed to allocate memory")
         };
         Self {
             type_id,
@@ -64,7 +63,7 @@ impl ComponentArray {
     ///
     /// ## Panics
     ///
-    /// - メモリ確保に失敗した場合にpanicする
+    /// - アロケーターがnullを返した場合にpanicする
     /// - `T`が[`Layout::from_size_align()`]の事前条件を満たさなかった場合にpanicする
     pub unsafe fn add_unchecked<T: bytemuck::Pod>(&mut self, value: T) {
         if self.len >= self.capacity {
@@ -79,8 +78,8 @@ impl ComponentArray {
                 .max(self.layout.size())
                 .max(1);
             let new_layout = Layout::from_size_align(new_alloc_size, self.layout.align()).unwrap();
-            let new_ptr = std::alloc::realloc(self.ptr, self.layout, new_layout.size());
-            assert!(!new_ptr.is_null(), "Failed to reallocate memory");
+            let new_ptr = std::alloc::realloc(self.ptr.as_ptr(), self.layout, new_layout.size());
+            let new_ptr = NonNull::new(new_ptr).expect("Failed to reallocate memory");
             self.ptr = new_ptr;
             self.layout = new_layout;
             self.capacity = new_capacity;
@@ -96,7 +95,7 @@ impl ComponentArray {
     /// - `T`はインスタンスの生成時に指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
     pub unsafe fn get_ptr<T: bytemuck::Pod>(&self, index: usize) -> *mut T {
-        let ptr = self.ptr.cast::<T>();
+        let ptr = self.ptr.as_ptr().cast::<T>();
         ptr.add(index)
     }
 
@@ -149,9 +148,9 @@ impl Drop for ComponentArray {
             #[cfg(debug_assertions)]
             {
                 // use-after-freeバグがあった場合にすぐに気づくことができるように適当な値(0xFF)で埋める
-                std::ptr::write_bytes(self.ptr, 0xFF, self.len * self.element_size);
+                std::ptr::write_bytes(self.ptr.as_ptr(), 0xFF, self.len * self.element_size);
             }
-            std::alloc::dealloc(self.ptr, self.layout);
+            std::alloc::dealloc(self.ptr.as_ptr(), self.layout);
         }
     }
 }
