@@ -86,8 +86,12 @@ impl<T> GenerationalVec<T> {
         None
     }
 
-    pub fn num_elements(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.entries.len() - self.empty_queue.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
     }
 }
 
@@ -140,14 +144,14 @@ mod test {
     #[test]
     fn num_elements() {
         let mut v = GenerationalVec::new();
-        assert_eq!(v.num_elements(), 0);
+        assert_eq!(v.len(), 0);
         let id1 = v.add(10);
         let id2 = v.add(20);
-        assert_eq!(v.num_elements(), 2);
+        assert_eq!(v.len(), 2);
         v.remove(id2);
-        assert_eq!(v.num_elements(), 1);
+        assert_eq!(v.len(), 1);
         v.remove(id1);
-        assert_eq!(v.num_elements(), 0);
+        assert_eq!(v.len(), 0);
     }
 
     #[test]
@@ -156,19 +160,19 @@ mod test {
         v.add(100);
         let id2 = v.add(200);
         v.add(300);
-        assert_eq!(v.num_elements(), 3);
+        assert_eq!(v.len(), 3);
         assert_eq!(v.entries.len(), 3);
 
         v.remove(id2);
-        assert_eq!(v.num_elements(), 2);
+        assert_eq!(v.len(), 2);
         assert_eq!(v.entries.len(), 3);
 
         v.add(400);
-        assert_eq!(v.num_elements(), 3);
+        assert_eq!(v.len(), 3);
         assert_eq!(v.entries.len(), 3);
 
         v.add(500);
-        assert_eq!(v.num_elements(), 4);
+        assert_eq!(v.len(), 4);
         assert_eq!(v.entries.len(), 4);
     }
 }
