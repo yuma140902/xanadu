@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -Dwarnings
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+    - run: cargo build --verbose
+    - run: cargo build --verbose --release
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@clippy
+    - run: cargo clippy --all-targets --verbose -- -Dclippy::all -Dclippy::pedantic -Aclippy::must-use-candidate -Dwarnings
+    - run: cargo clippy --all-targets --verbose --release -- -Dclippy::all -Dclippy::pedantic -Aclippy::must-use-candidate -Dwarnings
+
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+    - run: cargo doc --no-deps --all --verbose
+
+  tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+    - run: cargo test --verbose
+    - run: cargo test --verbose --release
+
+  tests-wasm-node:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+    - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+    - run: wasm-pack test --node --verbose
+    - run: wasm-pack test --node --verbose --release
+
+  tests-wasm-browser:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+    - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+    - uses: browser-actions/setup-firefox@v1
+    - run: firefox --version
+    - uses: browser-actions/setup-chrome@v1
+    - run: chrome --version
+    - run: wasm-pack test --headless --firefox -- --features test_in_browser --verbose
+    - run: wasm-pack test --headless --firefox -- --features test_in_browser --verbose --release
+    - run: wasm-pack test --headless --chrome -- --features test_in_browser --verbose
+    - run: wasm-pack test --headless --chrome -- --features test_in_browser --verbose --release
