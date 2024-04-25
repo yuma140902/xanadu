@@ -43,15 +43,15 @@ impl UntypedComponentArray {
         }
     }
 
-    pub fn len(&self) -> usize {
+    pub const fn len(&self) -> usize {
         self.len
     }
 
-    pub fn is_empty(&self) -> bool {
+    pub const fn is_empty(&self) -> bool {
         self.len == 0
     }
 
-    pub fn type_id(&self) -> std::any::TypeId {
+    pub const fn type_id(&self) -> std::any::TypeId {
         self.type_id
     }
 
@@ -94,7 +94,9 @@ impl UntypedComponentArray {
     ///
     /// - `T`はインスタンスの生成時に指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
-    pub unsafe fn get_ptr<T: bytemuck::Pod>(&self, index: usize) -> *mut T {
+    pub const unsafe fn get_ptr<T: bytemuck::Pod>(&self, index: usize) -> *mut T {
+        // https://github.com/rust-lang/rust/issues/117691
+        // の変更がリリースされたらNonNull.addを使うようにする
         let ptr = self.ptr.as_ptr().cast::<T>();
         ptr.add(index)
     }
@@ -103,6 +105,7 @@ impl UntypedComponentArray {
     ///
     /// - `T`はインスタンスの生成時に指定した型と同じでなければならない
     /// - `index`は0以上[`Self::len()`]未満でなければならない
+    #[allow(clippy::missing_const_for_fn)]
     pub unsafe fn get_unchecked<T: bytemuck::Pod>(&self, index: usize) -> &T {
         &*self.get_ptr(index)
     }

@@ -28,8 +28,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@clippy
-    - run: cargo clippy --all-targets --verbose -- -Dclippy::all -Dclippy::pedantic -Aclippy::must-use-candidate -Dwarnings
-    - run: cargo clippy --all-targets --verbose --release -- -Dclippy::all -Dclippy::pedantic -Aclippy::must-use-candidate -Dwarnings
+    - run: cargo clippy --all-targets --verbose           -- -Dclippy::all -Dclippy::nursery -Dwarnings
+    - run: cargo clippy --all-targets --verbose --release -- -Dclippy::all -Dclippy::nursery -Dwarnings
 
   doc:
     runs-on: ubuntu-latest
@@ -71,8 +71,8 @@ jobs:
     - run: chrome --version
     - run: wasm-pack test --headless --firefox -- --features test_in_browser --verbose
     - run: wasm-pack test --headless --firefox -- --features test_in_browser --verbose --release
-    - run: wasm-pack test --headless --chrome -- --features test_in_browser --verbose
-    - run: wasm-pack test --headless --chrome -- --features test_in_browser --verbose --release
+    - run: wasm-pack test --headless --chrome  -- --features test_in_browser --verbose
+    - run: wasm-pack test --headless --chrome  -- --features test_in_browser --verbose --release
 
   miri:
     runs-on: ubuntu-latest

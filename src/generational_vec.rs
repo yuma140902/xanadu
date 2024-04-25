@@ -22,14 +22,14 @@ pub struct GenerationalVec<T> {
 
 impl<T> GenerationalVec<T> {
     pub fn new() -> Self {
-        GenerationalVec {
+        Self {
             entries: Vec::new(),
             empty_queue: VecDeque::new(),
         }
     }
 
     pub fn with_capacity(capacity: usize) -> Self {
-        GenerationalVec {
+        Self {
             entries: Vec::with_capacity(capacity),
             empty_queue: VecDeque::new(),
         }

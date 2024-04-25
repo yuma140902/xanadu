@@ -3,7 +3,7 @@ pub struct ComponentArray<T> {
 }
 
 impl<T: bytemuck::Pod> ComponentArray<T> {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self { data: Vec::new() }
     }
 
