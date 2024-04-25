@@ -1,7 +1,7 @@
 use std::{alloc::Layout, ptr::NonNull};
 
 #[derive(Debug)]
-pub struct ComponentArray {
+pub struct UntypedComponentArray {
     ptr: NonNull<u8>,
     layout: Layout,
     len: usize,
@@ -10,7 +10,7 @@ pub struct ComponentArray {
     capacity: usize,
 }
 
-impl ComponentArray {
+impl UntypedComponentArray {
     /// ## Panics
     ///
     /// - アロケーターがnullを返した場合にpanicする
@@ -142,7 +142,7 @@ impl ComponentArray {
     }
 }
 
-impl Drop for ComponentArray {
+impl Drop for UntypedComponentArray {
     fn drop(&mut self) {
         unsafe {
             #[cfg(debug_assertions)]
@@ -167,13 +167,13 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn new() {
-        let _ = ComponentArray::new::<u32>();
+        let _ = UntypedComponentArray::new::<u32>();
     }
 
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn with_capacity() {
-        let _ = ComponentArray::with_capacity::<u32>(10);
+        let _ = UntypedComponentArray::with_capacity::<u32>(10);
     }
 
     #[repr(C)]
@@ -187,7 +187,7 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get_unsafe() {
-        let mut ca = ComponentArray::new::<Position>();
+        let mut ca = UntypedComponentArray::new::<Position>();
 
         unsafe {
             ca.add_unchecked(Position {
@@ -225,7 +225,7 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get() {
-        let mut ca = ComponentArray::new::<Position>();
+        let mut ca = UntypedComponentArray::new::<Position>();
 
         ca.add(Position {
             x: 1.0,
@@ -261,7 +261,7 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get_mut_field_unsafe() {
-        let mut ca = ComponentArray::new::<Position>();
+        let mut ca = UntypedComponentArray::new::<Position>();
 
         unsafe {
             ca.add_unchecked(Position {
@@ -293,7 +293,7 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get_mut_self_unsafe() {
-        let mut ca = ComponentArray::new::<Position>();
+        let mut ca = UntypedComponentArray::new::<Position>();
 
         unsafe {
             ca.add_unchecked(Position {
@@ -330,7 +330,7 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get_mut_field() {
-        let mut ca = ComponentArray::new::<Position>();
+        let mut ca = UntypedComponentArray::new::<Position>();
 
         ca.add(Position {
             x: 1.0,
@@ -360,7 +360,7 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn add_and_get_mut_self() {
-        let mut ca = ComponentArray::new::<Position>();
+        let mut ca = UntypedComponentArray::new::<Position>();
 
         ca.add(Position {
             x: 1.0,
@@ -395,7 +395,7 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn get_out_of_range() {
-        let mut ca = ComponentArray::new::<Position>();
+        let mut ca = UntypedComponentArray::new::<Position>();
         ca.add(Position {
             x: 1.0,
             y: 2.0,
@@ -408,7 +408,7 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn get_wrong_type() {
-        let mut ca = ComponentArray::new::<Position>();
+        let mut ca = UntypedComponentArray::new::<Position>();
         ca.add(Position {
             x: 1.0,
             y: 2.0,
@@ -421,8 +421,8 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn multiple_array() {
-        let mut c1 = ComponentArray::new::<Position>();
-        let mut c2 = ComponentArray::new::<Position>();
+        let mut c1 = UntypedComponentArray::new::<Position>();
+        let mut c2 = UntypedComponentArray::new::<Position>();
 
         c1.add(Position {
             x: 1.0,
@@ -460,7 +460,7 @@ mod test {
     #[test]
     #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn empty_type() {
-        let mut ca = ComponentArray::new::<()>();
+        let mut ca = UntypedComponentArray::new::<()>();
         ca.add(());
         let elem = ca.get::<()>(0);
         assert_eq!(elem, Some(&()));
