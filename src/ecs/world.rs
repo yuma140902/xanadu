@@ -1,11 +1,32 @@
 use crate::generational_vec::{GenerationalId, GenerationalVec};
 
+pub struct WorldBuilder {
+    world: World,
+}
+
+impl WorldBuilder {
+    pub fn new() -> Self {
+        Self {
+            world: World::new(),
+        }
+    }
+    pub fn build(self) -> World {
+        self.world
+    }
+}
+
+impl Default for WorldBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub struct World {
     entities: GenerationalVec<()>,
 }
 
 impl World {
-    pub fn new() -> Self {
+    pub(self) fn new() -> Self {
         Self {
             entities: GenerationalVec::new(),
         }
