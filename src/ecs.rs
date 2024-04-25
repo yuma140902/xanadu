@@ -1,3 +1,4 @@
+mod typed_component_array;
 mod untyped_component_array;
 mod world;
 
@@ -6,5 +7,6 @@ pub mod unsafe_pool {
 }
 
 pub mod dyn_pool {
+    pub use super::typed_component_array::*;
     pub use super::world::*;
 }

@@ -3,7 +3,7 @@ use std::collections::VecDeque;
 /// 世代型ID
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct GenerationalId {
-    index: usize,
+    pub(crate) index: usize,
     generation: u32,
 }
 
