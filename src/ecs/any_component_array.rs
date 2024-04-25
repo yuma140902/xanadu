@@ -18,6 +18,10 @@ impl AnyComponentArray {
     pub fn downcast<T: bytemuck::Pod>(&self) -> Option<&ComponentArray<T>> {
         self.inner.downcast_ref()
     }
+
+    pub fn downcast_mut<T: bytemuck::Pod>(&mut self) -> Option<&mut ComponentArray<T>> {
+        self.inner.downcast_mut()
+    }
 }
 
 #[cfg(test)]
@@ -30,5 +34,13 @@ mod test {
         let any_array = AnyComponentArray::from(array);
         assert!(any_array.downcast::<i32>().is_some());
         assert!(any_array.downcast::<f32>().is_none());
+    }
+
+    #[test]
+    fn downcast_mut() {
+        let array = ComponentArray::<i32>::new();
+        let mut any_array = AnyComponentArray::from(array);
+        assert!(any_array.downcast_mut::<i32>().is_some());
+        assert!(any_array.downcast_mut::<f32>().is_none());
     }
 }

@@ -7,17 +7,18 @@ impl<T: bytemuck::Pod> ComponentArray<T> {
         Self { data: Vec::new() }
     }
 
-    pub fn insert(&mut self, index: usize, component: T) {
+    /// 指定されたインデックスにコンポーネントを追加する
+    ///
+    /// ## Returns
+    ///
+    /// 以前のコンポーネントがあればそれを返す。なければNoneを返す
+    pub fn replace(&mut self, index: usize, component: T) -> Option<T> {
         if index >= self.data.len() {
             self.data.resize_with(index + 1, || None);
         }
+        let old = self.data[index];
         self.data[index] = Some(component);
-    }
-
-    pub fn remove(&mut self, index: usize) {
-        if let Some(component) = self.data.get_mut(index) {
-            *component = None;
-        }
+        old
     }
 }
 
@@ -31,18 +32,18 @@ impl<T: bytemuck::Pod> Default for ComponentArray<T> {
 mod test {
     use super::*;
     #[test]
-    fn insert() {
+    fn replace() {
         let mut array = ComponentArray::new();
-        array.insert(0, 42);
+        array.replace(0, 42);
         assert_eq!(array.data.len(), 1);
         assert_eq!(array.data[0], Some(42));
     }
 
     #[test]
-    fn insert_offset() {
+    fn replace_offset() {
         let mut array = ComponentArray::new();
-        array.insert(0, 42);
-        array.insert(2, 43);
+        array.replace(0, 42);
+        array.replace(2, 43);
         assert_eq!(array.data.len(), 3);
         assert_eq!(array.data[0], Some(42));
         assert_eq!(array.data[1], None);
@@ -50,11 +51,9 @@ mod test {
     }
 
     #[test]
-    fn remove() {
+    fn replace_return_value() {
         let mut array = ComponentArray::new();
-        array.insert(0, 42);
-        array.remove(0);
-        assert_eq!(array.data.len(), 1);
-        assert_eq!(array.data[0], None);
+        assert_eq!(array.replace(0, 42), None);
+        assert_eq!(array.replace(0, 43), Some(42));
     }
 }

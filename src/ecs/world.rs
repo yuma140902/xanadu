@@ -15,7 +15,7 @@ impl WorldBuilder {
         }
     }
 
-    pub fn register_component<T: bytemuck::Pod>(&mut self) -> &mut Self {
+    pub fn register_component<T: bytemuck::Pod>(mut self) -> Self {
         self.world.register_component::<T>();
         self
     }
@@ -49,8 +49,31 @@ impl World {
             .insert(TypeId::of::<T>(), ComponentArray::<T>::new().into());
     }
 
+    pub fn builder() -> WorldBuilder {
+        WorldBuilder::new()
+    }
+
     pub fn new_entity(&mut self) -> GenerationalId {
         self.entities.add(())
+    }
+
+    /// エンティティにコンポーネントを追加する
+    ///
+    ///
+    /// ## Returns
+    ///
+    /// 以前のコンポーネントがあればそれを返す。なければNoneを返す
+    pub fn attach_component<T: bytemuck::Pod>(
+        &mut self,
+        entity: GenerationalId,
+        component: T,
+    ) -> Option<T> {
+        if let Some(array) = self.component_arrays.get_mut(&TypeId::of::<T>()) {
+            if let Some(array) = array.downcast_mut::<T>() {
+                return array.replace(entity.index, component);
+            }
+        }
+        None
     }
 }
 
@@ -77,5 +100,13 @@ mod test {
         let entity = world.new_entity();
         assert_eq!(world.entities.len(), 1);
         assert_eq!(world.entities.get(entity), Some(&()));
+    }
+
+    #[test]
+    fn attach_component_return_value() {
+        let mut world = World::builder().register_component::<i32>().build();
+        let entity = world.new_entity();
+        assert_eq!(world.attach_component(entity, 42), None);
+        assert_eq!(world.attach_component(entity, 43), Some(42));
     }
 }
