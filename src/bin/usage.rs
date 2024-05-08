@@ -8,44 +8,37 @@ pub struct Position {
     pub z: f64,
 }
 
-#[repr(C)]
-#[derive(Debug, Default, Clone, Copy, bytemuck::Pod, bytemuck::Zeroable, PartialEq)]
-pub struct Velocity {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
-}
-
-#[allow(clippy::missing_const_for_fn)]
 fn main() {
-    let mut world = World::builder()
-        .register_component::<Position>()
-        .register_component::<Velocity>()
-        .build();
-
-    const NUM_ENTITIES: usize = 1_000_000;
-    for i in 0..NUM_ENTITIES {
+    let mut world = World::builder().register_component::<Position>().build();
+    for i in 0..5 {
         let entity = world.new_entity();
         world.attach_component(
             entity,
             Position {
-                x: i as f64 * 0.1,
-                y: i as f64 * 0.1,
-                z: i as f64 * 0.1,
+                x: i as f64,
+                y: i as f64,
+                z: i as f64,
             },
         );
-        world.attach_component(entity, Velocity::default());
     }
 
-    let timer = std::time::Instant::now();
     world.execute::<'_, Position, _>(&print_system);
+    world.execute::<'_, Mut<Position>, _>(&shuffle_system);
     world.execute::<'_, Mut<Position>, _>(&increment_system);
+    world.execute::<'_, Mut<Position>, _>(&shuffle_system);
+    println!("Shuffled and incremented");
     world.execute::<'_, Position, _>(&print_system);
-    eprintln!("{:?}", timer.elapsed());
 }
 
 fn print_system(pos: &Position) {
     println!("Pos: [{}, {}, {}]", pos.x, pos.y, pos.z);
+}
+
+fn shuffle_system(pos: &mut Position) {
+    let tmp = pos.x;
+    pos.x = pos.y;
+    pos.y = pos.z;
+    pos.z = tmp;
 }
 
 fn increment_system(pos: &mut Position) {
