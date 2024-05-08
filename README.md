@@ -21,8 +21,8 @@ cargo bench
 | ------------------ | --------- | --------- | --------- | -------- |
 | xanadu             |       218 |      1575 |     22.39 |    466.4 |
 | bevy_ecs           |       169 |      1517 |     18.07 |    283.4 |
-| game_objects_vec   |       250 |      3636 |    149.6  |   1349   |
-| game_objects_hash  |       161 |      2693 |     31.77 |   1023   |
+| game_objects_vec   |       161 |      2693 |     31.77 |   1023   |
+| game_objects_hash  |       250 |      3636 |    149.6  |   1349   |
 
 code: [bench_ecs.rs](./benches/bench_ecs.rs)
 
