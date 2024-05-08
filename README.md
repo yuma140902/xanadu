@@ -4,7 +4,7 @@
 [![Crates.io Version](https://img.shields.io/crates/v/xanadu)](https://crates.io/crates/xanadu)
 [![docs.rs](https://img.shields.io/docsrs/xanadu?logo=docsdotrs)](https://docs.rs/xanadu/latest/xanadu/)
 
-A toy ECS library
+A toy ECS library; works on Windows, macOS, Linux and WebAssembly.
 
 ## Benchmark
 
