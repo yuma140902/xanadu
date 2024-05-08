@@ -14,6 +14,9 @@ cargo bench
 
 ### Result
 
+![image](https://github.com/yuma140902/Xanadu/assets/23431077/eb76659c-fb39-440c-9d90-be446cf026a4)
+
+
 | Number of entities | 10^2 (ns) | 10^3 (ns) | 10^4 (μn) | 1^5 (μn) |
 | ------------------ | --------- | --------- | --------- | -------- |
 | xanadu             |       218 |      1575 |     22.39 |    466.4 |
