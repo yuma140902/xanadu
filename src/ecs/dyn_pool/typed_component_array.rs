@@ -1,8 +1,10 @@
+use super::Component;
+
 pub struct ComponentArray<T> {
     data: Vec<Option<T>>,
 }
 
-impl<T: bytemuck::Pod> ComponentArray<T> {
+impl<T: Component> ComponentArray<T> {
     pub const fn new() -> Self {
         Self { data: Vec::new() }
     }
@@ -22,7 +24,7 @@ impl<T: bytemuck::Pod> ComponentArray<T> {
     }
 }
 
-impl<T: bytemuck::Pod> Default for ComponentArray<T> {
+impl<T: Component> Default for ComponentArray<T> {
     fn default() -> Self {
         Self::new()
     }

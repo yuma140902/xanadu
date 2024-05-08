@@ -2,7 +2,7 @@ use std::{any::TypeId, collections::HashMap};
 
 use crate::generational_vec::{GenerationalId, GenerationalVec};
 
-use super::{AnyComponentArray, ComponentArray};
+use super::{AnyComponentArray, Component, ComponentArray};
 
 pub struct WorldBuilder {
     world: World,
@@ -15,7 +15,7 @@ impl WorldBuilder {
         }
     }
 
-    pub fn register_component<T: bytemuck::Pod>(mut self) -> Self {
+    pub fn register_component<T: Component>(mut self) -> Self {
         self.world.register_component::<T>();
         self
     }
@@ -44,7 +44,7 @@ impl World {
         }
     }
 
-    pub(self) fn register_component<T: bytemuck::Pod>(&mut self) {
+    pub(self) fn register_component<T: Component>(&mut self) {
         self.component_arrays
             .insert(TypeId::of::<T>(), ComponentArray::<T>::new().into());
     }
@@ -63,7 +63,7 @@ impl World {
     /// ## Returns
     ///
     /// 以前のコンポーネントがあればそれを返す。なければNoneを返す
-    pub fn attach_component<T: bytemuck::Pod>(
+    pub fn attach_component<T: Component>(
         &mut self,
         entity: GenerationalId,
         component: T,

@@ -1,12 +1,12 @@
 use std::any::Any;
 
-use super::ComponentArray;
+use super::{Component, ComponentArray};
 
 pub struct AnyComponentArray {
     inner: Box<dyn Any>,
 }
 
-impl<T: bytemuck::Pod> From<ComponentArray<T>> for AnyComponentArray {
+impl<T: Component> From<ComponentArray<T>> for AnyComponentArray {
     fn from(value: ComponentArray<T>) -> Self {
         Self {
             inner: Box::new(value),
@@ -15,11 +15,11 @@ impl<T: bytemuck::Pod> From<ComponentArray<T>> for AnyComponentArray {
 }
 
 impl AnyComponentArray {
-    pub fn downcast<T: bytemuck::Pod>(&self) -> Option<&ComponentArray<T>> {
+    pub fn downcast<T: Component>(&self) -> Option<&ComponentArray<T>> {
         self.inner.downcast_ref()
     }
 
-    pub fn downcast_mut<T: bytemuck::Pod>(&mut self) -> Option<&mut ComponentArray<T>> {
+    pub fn downcast_mut<T: Component>(&mut self) -> Option<&mut ComponentArray<T>> {
         self.inner.downcast_mut()
     }
 }
