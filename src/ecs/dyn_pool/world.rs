@@ -2,7 +2,7 @@ use std::{any::TypeId, collections::HashMap};
 
 use crate::generational_vec::{GenerationalId, GenerationalVec};
 
-use super::dyn_pool::{AnyComponentArray, ComponentArray};
+use super::{AnyComponentArray, ComponentArray};
 
 pub struct WorldBuilder {
     world: World,

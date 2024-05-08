@@ -1,6 +1,6 @@
 use std::any::Any;
 
-use super::dyn_pool::ComponentArray;
+use super::ComponentArray;
 
 pub struct AnyComponentArray {
     inner: Box<dyn Any>,
