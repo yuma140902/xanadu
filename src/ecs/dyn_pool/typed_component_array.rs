@@ -1,3 +1,5 @@
+use core::slice;
+
 use super::Component;
 
 pub struct ComponentArray<T> {
@@ -21,6 +23,14 @@ impl<T: Component> ComponentArray<T> {
         let old = self.data[index];
         self.data[index] = Some(component);
         old
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
+        self.data.iter().filter_map(|v| v.as_ref())
+    }
+
+    pub fn data_iter(&self) -> slice::Iter<'_, Option<T>> {
+        self.data.iter()
     }
 }
 

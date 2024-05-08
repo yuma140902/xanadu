@@ -75,6 +75,14 @@ impl World {
         }
         None
     }
+
+    pub fn get_component_array<T: Component>(&self) -> Option<&ComponentArray<T>> {
+        if let Some(any_array) = self.component_arrays.get(&TypeId::of::<T>()) {
+            any_array.downcast::<T>()
+        } else {
+            None
+        }
+    }
 }
 
 impl Default for World {
