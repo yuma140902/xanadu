@@ -2,7 +2,7 @@ use super::{Component, World};
 
 pub trait Query<'world, T> {
     type Iter: Iterator<Item = T>;
-    fn get_iterator(&self, world: &'world World) -> Self::Iter;
+    fn get_iterator(world: &'world World) -> Self::Iter;
 }
 
 impl<'world, C> Query<'world, &'world C> for C
@@ -11,7 +11,7 @@ where
 {
     type Iter = SingleQueueIter<'world, C>;
 
-    fn get_iterator(&self, world: &'world World) -> Self::Iter {
+    fn get_iterator(world: &'world World) -> Self::Iter {
         SingleQueueIter {
             iter: world
                 .get_component_array::<C>()

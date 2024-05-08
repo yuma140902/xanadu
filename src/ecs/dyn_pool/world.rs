@@ -2,7 +2,7 @@ use std::{any::TypeId, collections::HashMap};
 
 use crate::generational_vec::{GenerationalId, GenerationalVec};
 
-use super::{AnyComponentArray, Component, ComponentArray};
+use super::{AnyComponentArray, Component, ComponentArray, Query, System};
 
 pub struct WorldBuilder {
     world: World,
@@ -80,6 +80,13 @@ impl World {
         self.component_arrays
             .get(&TypeId::of::<T>())
             .and_then(|any_array| any_array.downcast::<T>())
+    }
+
+    pub fn execute<'world, Q, T>(&'world self, system: &'world impl System<'world, Q, T>)
+    where
+        Q: Query<'world, T>,
+    {
+        system.execute(self);
     }
 }
 
