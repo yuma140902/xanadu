@@ -4,7 +4,16 @@ use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use xanadu::ecs::dyn_pool::{Mut, World};
 
 #[repr(C)]
-#[derive(Debug, Default, Clone, Copy, bytemuck::Pod, bytemuck::Zeroable, PartialEq)]
+#[derive(
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    bytemuck::Pod,
+    bytemuck::Zeroable,
+    PartialEq,
+    bevy_ecs::prelude::Component,
+)]
 pub struct Position {
     pub x: f64,
     pub y: f64,
@@ -12,7 +21,9 @@ pub struct Position {
 }
 
 #[repr(C)]
-#[derive(Debug, Clone, Copy, bytemuck::Pod, bytemuck::Zeroable, PartialEq)]
+#[derive(
+    Debug, Clone, Copy, bytemuck::Pod, bytemuck::Zeroable, PartialEq, bevy_ecs::prelude::Component,
+)]
 pub struct OtherData {
     pub data: [f64; 128],
 }
@@ -44,8 +55,26 @@ fn increment_system(pos: &mut Position) {
     pos.z += black_box(3.0);
 }
 
-fn benchmark_ecs(c: &mut Criterion) {
-    c.bench_function("ecs", |b| {
+fn shuffle_system_bevy1(mut query: bevy_ecs::prelude::Query<(&mut Position,)>) {
+    for (mut pos,) in query.iter_mut() {
+        shuffle_system(&mut pos);
+    }
+}
+
+fn shuffle_system_bevy2(mut query: bevy_ecs::prelude::Query<(&mut Position,)>) {
+    for (mut pos,) in query.iter_mut() {
+        shuffle_system(&mut pos);
+    }
+}
+
+fn increment_system_bevy(mut query: bevy_ecs::prelude::Query<(&mut Position,)>) {
+    for (mut pos,) in query.iter_mut() {
+        increment_system(&mut pos);
+    }
+}
+
+fn benchmark_xanadu(c: &mut Criterion) {
+    c.bench_function("xanadu", |b| {
         let mut world = World::builder()
             .register_component::<Position>()
             .register_component::<OtherData>()
@@ -69,6 +98,33 @@ fn benchmark_ecs(c: &mut Criterion) {
             world.execute::<'_, Mut<Position>, _>(&increment_system);
             world.execute::<'_, Mut<Position>, _>(&shuffle_system);
         })
+    });
+}
+
+fn benchmark_bevy_ecs(c: &mut Criterion) {
+    use bevy_ecs::prelude::*;
+
+    c.bench_function("bevy_ecs", |b| {
+        let mut world = World::new();
+        for i in 0..NUM_ENTITIES {
+            world.spawn((
+                Position {
+                    x: black_box(i as f64 * 0.1),
+                    y: black_box(i as f64 * 0.1),
+                    z: black_box(i as f64 * 0.1),
+                },
+                OtherData::default(),
+            ));
+        }
+
+        let mut schedule = Schedule::default();
+        schedule.add_systems(
+            increment_system_bevy
+                .after(shuffle_system_bevy1)
+                .before(shuffle_system_bevy2),
+        );
+
+        b.iter(|| schedule.run(&mut world))
     });
 }
 
@@ -135,7 +191,8 @@ fn benchmark_game_objects_vec(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    benchmark_ecs,
+    benchmark_xanadu,
+    benchmark_bevy_ecs,
     benchmark_game_objects_hash,
     benchmark_game_objects_vec,
 );

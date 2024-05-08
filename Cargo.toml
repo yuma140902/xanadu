@@ -23,6 +23,7 @@ test_in_browser = []
 
 [dev-dependencies]
 criterion = { version = "0.5.1", features = ["html_reports"] }
+bevy_ecs = "0.13.2"
 
 [[bench]]
 name = "bench_ecs"
