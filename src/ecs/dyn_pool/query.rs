@@ -12,12 +12,10 @@ where
     type Iter = SingleQueueIter<'world, C>;
 
     fn get_iterator(&self, world: &'world World) -> Self::Iter {
-        if let Some(array) = world.get_component_array::<C>() {
-            SingleQueueIter {
-                iter: array.data_iter(),
-            }
-        } else {
-            SingleQueueIter { iter: [].iter() }
+        SingleQueueIter {
+            iter: world
+                .get_component_array::<C>()
+                .map_or_else(|| [].iter(), |array| array.data_iter()),
         }
     }
 }

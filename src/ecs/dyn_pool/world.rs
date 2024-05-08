@@ -77,11 +77,9 @@ impl World {
     }
 
     pub fn get_component_array<T: Component>(&self) -> Option<&ComponentArray<T>> {
-        if let Some(any_array) = self.component_arrays.get(&TypeId::of::<T>()) {
-            any_array.downcast::<T>()
-        } else {
-            None
-        }
+        self.component_arrays
+            .get(&TypeId::of::<T>())
+            .and_then(|any_array| any_array.downcast::<T>())
     }
 }
 
