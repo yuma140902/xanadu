@@ -32,6 +32,14 @@ impl<T: Component> ComponentArray<T> {
     pub fn data_iter(&self) -> slice::Iter<'_, Option<T>> {
         self.data.iter()
     }
+
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
+        self.data.iter_mut().filter_map(|v| v.as_mut())
+    }
+
+    pub fn data_iter_mut(&mut self) -> slice::IterMut<'_, Option<T>> {
+        self.data.iter_mut()
+    }
 }
 
 impl<T: Component> Default for ComponentArray<T> {

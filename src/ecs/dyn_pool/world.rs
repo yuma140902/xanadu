@@ -82,7 +82,13 @@ impl World {
             .and_then(|any_array| any_array.downcast::<T>())
     }
 
-    pub fn execute<'world, Q, T>(&'world self, system: &'world impl System<'world, Q, T>)
+    pub fn get_component_array_mut<T: Component>(&mut self) -> Option<&mut ComponentArray<T>> {
+        self.component_arrays
+            .get_mut(&TypeId::of::<T>())
+            .and_then(|any_array| any_array.downcast_mut::<T>())
+    }
+
+    pub fn execute<'world, Q, T>(&'world mut self, system: &'world impl System<'world, Q, T>)
     where
         Q: Query<'world, T>,
     {
