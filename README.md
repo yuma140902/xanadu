@@ -14,14 +14,12 @@ cargo bench
 
 ### Result
 
-as of commit 7ffc8e84d7011fc2c459b5e1f31ec068f8d3005e
-
-| name              | mean (μs) | median (μs) |
-| ----------------- | --------- | ----------- |
-| `xanadu`            |       467 |         463 |
-| `bevy_ecs`          |       290 |         288 |
-| `game_objects_vec`  |       972 |         942 |
-| `game_objects_hash` |      1386 |        1342 |
+| Number of entities | 10^2 (ns) | 10^3 (ns) | 10^4 (μn) | 1^5 (μn) |
+| ------------------ | --------- | --------- | --------- | -------- |
+| xanadu             |       218 |      1575 |     22.39 |    466.4 |
+| bevy_ecs           |       169 |      1517 |     18.07 |    283.4 |
+| game_objects_vec   |       250 |      3636 |    149.6  |   1349   |
+| game_objects_hash  |       161 |      2693 |     31.77 |   1023   |
 
 code: [bench_ecs.rs](./benches/bench_ecs.rs)
 

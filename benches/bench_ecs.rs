@@ -121,10 +121,10 @@ fn setup_bevy_ecs(n: usize) -> (bevy_ecs::prelude::World, bevy_ecs::prelude::Sch
 }
 
 fn benchmark_bevy_ecs(
-    mut world: &mut bevy_ecs::prelude::World,
+    world: &mut bevy_ecs::prelude::World,
     schedule: &mut bevy_ecs::prelude::Schedule,
 ) {
-    schedule.run(&mut world);
+    schedule.run(world);
 }
 
 fn setup_game_objects_hash(n: usize) -> HashMap<u64, GameObject> {
@@ -174,7 +174,7 @@ fn setup_game_objects_vec(n: usize) -> Vec<GameObject> {
     game_objects
 }
 
-fn benchmark_game_objects_vec(game_objects: &mut Vec<GameObject>) {
+fn benchmark_game_objects_vec(game_objects: &mut [GameObject]) {
     for game_object in game_objects.iter_mut() {
         shuffle_system(&mut game_object.position);
     }
