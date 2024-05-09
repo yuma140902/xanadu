@@ -9,7 +9,7 @@ A toy ECS library; works on Windows, macOS, Linux and WebAssembly.
 ## Benchmark
 
 ```sh
-cargo bench
+cargo bench --workspace
 ```
 
 ### Result
@@ -28,7 +28,7 @@ cargo bench
 - CPU: Intel Core i7-12700
 - RAM: 32GB
 
-code: [bench_ecs.rs](./benches/bench_ecs.rs)
+code: [bench.rs](./benchmark-lib/benches/bench.rs)
 
 ## Usage
 
