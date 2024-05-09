@@ -21,11 +21,11 @@ test_in_browser = []
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 wasm-bindgen-test = "0.3.42"
 
-[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
-criterion = { version = "0.5.1", features = ["html_reports"] }
-bevy_ecs = "0.13.2"
-specs = "0.20.0"
+[workspace]
+members = [
+  "benchmark-lib"
+]
 
-[[bench]]
-name = "bench_ecs"
-harness = false
+[workspace.package]
+edition = "2018"
+license = "MPL-2.0"
