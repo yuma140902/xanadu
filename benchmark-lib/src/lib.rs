@@ -17,6 +17,19 @@ pub mod xanadu_bench;
     PartialEq,
     bevy_ecs::prelude::Component,
 )]
+pub struct Id(usize);
+
+#[repr(C)]
+#[derive(
+    Debug,
+    Default,
+    Clone,
+    Copy,
+    bytemuck::Pod,
+    bytemuck::Zeroable,
+    PartialEq,
+    bevy_ecs::prelude::Component,
+)]
 pub struct Position {
     pub x: f64,
     pub y: f64,
@@ -38,7 +51,7 @@ impl Default for OtherData {
 }
 
 pub struct GameObject {
-    pub id: u64,
+    pub id: usize,
     pub position: Option<Position>,
     pub other_data: Option<OtherData>,
 }

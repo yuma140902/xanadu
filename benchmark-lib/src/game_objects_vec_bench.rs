@@ -6,7 +6,7 @@ pub fn setup(n: usize) -> Vec<GameObject> {
     let mut game_objects = Vec::with_capacity(n);
     for i in 0..n {
         game_objects.push(GameObject {
-            id: i as u64,
+            id: i,
             position: if i % 4 != 0 {
                 Some(Position {
                     x: black_box(i as f64 * 0.1),

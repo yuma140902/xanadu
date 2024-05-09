@@ -86,7 +86,7 @@ fn increment_system(pos: &mut Position) {
 ## Tests
 
 ```sh
-cargo t
+cargo t --workspace
 ```
 
 ```sh
