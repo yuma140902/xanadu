@@ -8,27 +8,7 @@ A toy ECS library; works on Windows, macOS, Linux and WebAssembly.
 
 ## Benchmark
 
-```sh
-cargo bench --workspace
-```
-
-### Result
-
-![image](https://github.com/yuma140902/Xanadu/assets/23431077/dc0ef1b0-4251-4de2-b85c-ba3c17501ae0)
-
-| Number of entities | 10^2 (ns) | 10^3 (ns) | 10^4 (μs) | 10^5 (μs) |
-| ------------------ | --------- | --------- | --------- | --------- |
-| xanadu             |       188 |      1639 |     19.20 |     492.3 |
-| bevy_ecs           |       130 |      1145 |     13.52 |     228.2 |
-| specs              |      1651 |      8147 |     33.23 |     368.2 |
-| game_objects_vec   |       138 |      2661 |     39.11 |     991.5 |
-| game_objects_hash  |       255 |      3365 |    172.4  |    1929   |
-
-- OS: Windows 11 Home 23H2
-- CPU: Intel Core i7-12700
-- RAM: 32GB
-
-code: [bench.rs](./benchmark-lib/benches/bench.rs)
+[Benchmark](./doc/benchmark.md)
 
 ## Usage
 
