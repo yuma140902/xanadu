@@ -39,8 +39,8 @@ impl Default for OtherData {
 
 pub struct GameObject {
     pub id: u64,
-    pub position: Position,
-    pub other_data: OtherData,
+    pub position: Option<Position>,
+    pub other_data: Option<OtherData>,
 }
 
 fn benchmark(c: &mut Criterion) {
@@ -78,15 +78,19 @@ fn setup_xanadu(n: usize) -> World {
 
     for i in 0..n {
         let entity = world.new_entity();
-        world.attach_component(
-            entity,
-            Position {
-                x: black_box(i as f64 * 0.1),
-                y: black_box(i as f64 * 0.1),
-                z: black_box(i as f64 * 0.1),
-            },
-        );
-        world.attach_component(entity, OtherData::default());
+        if i % 4 != 0 {
+            world.attach_component(
+                entity,
+                Position {
+                    x: black_box(i as f64 * 0.1),
+                    y: black_box(i as f64 * 0.1),
+                    z: black_box(i as f64 * 0.1),
+                },
+            );
+        }
+        if i % 3 == 0 {
+            world.attach_component(entity, OtherData::default());
+        }
     }
 
     world
@@ -103,11 +107,26 @@ fn setup_bevy_ecs(n: usize) -> (bevy_ecs::prelude::World, bevy_ecs::prelude::Sch
 
     let mut world = bevy_ecs::prelude::World::new();
     for i in 0..n {
-        world.spawn((Position {
-            x: black_box(i as f64 * 0.1),
-            y: black_box(i as f64 * 0.1),
-            z: black_box(i as f64 * 0.1),
-        },));
+        if i % 4 != 0 && i % 3 == 0 {
+            world.spawn((
+                Position {
+                    x: black_box(i as f64 * 0.1),
+                    y: black_box(i as f64 * 0.1),
+                    z: black_box(i as f64 * 0.1),
+                },
+                OtherData::default(),
+            ));
+        } else if i % 4 != 0 {
+            world.spawn((Position {
+                x: black_box(i as f64 * 0.1),
+                y: black_box(i as f64 * 0.1),
+                z: black_box(i as f64 * 0.1),
+            },));
+        } else if i % 3 == 0 {
+            world.spawn((OtherData::default(),));
+        } else {
+            world.spawn(());
+        }
     }
 
     let mut schedule = Schedule::default();
@@ -134,12 +153,20 @@ fn setup_game_objects_hash(n: usize) -> HashMap<u64, GameObject> {
             i as u64,
             GameObject {
                 id: i as u64,
-                position: Position {
-                    x: black_box(i as f64 * 0.1),
-                    y: black_box(i as f64 * 0.1),
-                    z: black_box(i as f64 * 0.1),
+                position: if i % 4 != 0 {
+                    Some(Position {
+                        x: black_box(i as f64 * 0.1),
+                        y: black_box(i as f64 * 0.1),
+                        z: black_box(i as f64 * 0.1),
+                    })
+                } else {
+                    None
                 },
-                other_data: OtherData::default(),
+                other_data: if i % 3 == 0 {
+                    Some(OtherData::default())
+                } else {
+                    None
+                },
             },
         );
     }
@@ -148,13 +175,19 @@ fn setup_game_objects_hash(n: usize) -> HashMap<u64, GameObject> {
 
 fn benchmark_game_objects_hash(game_objects: &mut HashMap<u64, GameObject>) {
     for game_object in game_objects.values_mut() {
-        shuffle_system(&mut game_object.position);
+        if let Some(pos) = &mut game_object.position {
+            shuffle_system(pos);
+        }
     }
     for game_object in game_objects.values_mut() {
-        increment_system(&mut game_object.position);
+        if let Some(pos) = &mut game_object.position {
+            increment_system(pos);
+        }
     }
     for game_object in game_objects.values_mut() {
-        shuffle_system(&mut game_object.position);
+        if let Some(pos) = &mut game_object.position {
+            shuffle_system(pos);
+        }
     }
 }
 
@@ -163,12 +196,20 @@ fn setup_game_objects_vec(n: usize) -> Vec<GameObject> {
     for i in 0..n {
         game_objects.push(GameObject {
             id: i as u64,
-            position: Position {
-                x: black_box(i as f64 * 0.1),
-                y: black_box(i as f64 * 0.1),
-                z: black_box(i as f64 * 0.1),
+            position: if i % 4 != 0 {
+                Some(Position {
+                    x: black_box(i as f64 * 0.1),
+                    y: black_box(i as f64 * 0.1),
+                    z: black_box(i as f64 * 0.1),
+                })
+            } else {
+                None
             },
-            other_data: OtherData::default(),
+            other_data: if i % 3 == 0 {
+                Some(OtherData::default())
+            } else {
+                None
+            },
         });
     }
     game_objects
@@ -176,13 +217,19 @@ fn setup_game_objects_vec(n: usize) -> Vec<GameObject> {
 
 fn benchmark_game_objects_vec(game_objects: &mut [GameObject]) {
     for game_object in game_objects.iter_mut() {
-        shuffle_system(&mut game_object.position);
+        if let Some(pos) = &mut game_object.position {
+            shuffle_system(pos);
+        }
     }
     for game_object in game_objects.iter_mut() {
-        increment_system(&mut game_object.position);
+        if let Some(pos) = &mut game_object.position {
+            increment_system(pos);
+        }
     }
     for game_object in game_objects.iter_mut() {
-        shuffle_system(&mut game_object.position);
+        if let Some(pos) = &mut game_object.position {
+            shuffle_system(pos);
+        }
     }
 }
 
