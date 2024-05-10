@@ -18,6 +18,6 @@ cargo bench --workspace
 
 - OS: Windows 11 Home 23H2
 - CPU: Intel Core i7-12700
-- RAM: 32GB
+- RAM: Samsung DDR4 3200MHz 16GB x 2
 
 code: [bench.rs](../benchmark-lib/benches/bench.rs)
