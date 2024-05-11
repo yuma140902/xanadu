@@ -59,4 +59,26 @@
 pub mod collections;
 
 /// ECS module; main module of this library.
+///
+/// # ECS
+///
+/// ECS stands for Entity-Component-System. It is a design pattern used in game development. It is
+/// known for its performance when dealing with large number of entities.
+///
+/// # Entities
+///
+/// Entities are unique identifiers that have no intrinsic properties on their own. They are just
+/// identities used to keep track of components attached to them. In Xanadu, entities are just
+/// [`GenerationalId`](collections::GenerationalId)s.
+///
+/// # Components
+///
+/// Components are data structures that can be attached to entities. In Xanadu, components are
+/// types which implement [`Component`](ecs::Component) trait.
+///
+/// # Systems
+///
+/// Systems are functions that operate on components. In Xanadu, systems are types which implement
+/// [`System`](ecs::System) trait. They are usually functions that take a reference to a component
+/// and return nothing.
 pub mod ecs;
