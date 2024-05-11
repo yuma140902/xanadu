@@ -1,13 +1,11 @@
 use std::slice;
 
-use crate::ecs::Component;
-
 /// 型付きの配列
 pub struct TypedArray<T> {
     data: Vec<Option<T>>,
 }
 
-impl<T: Component> TypedArray<T> {
+impl<T> TypedArray<T> {
     pub const fn new() -> Self {
         Self { data: Vec::new() }
     }
@@ -21,9 +19,7 @@ impl<T: Component> TypedArray<T> {
         if index >= self.data.len() {
             self.data.resize_with(index + 1, || None);
         }
-        let old = self.data[index];
-        self.data[index] = Some(component);
-        old
+        self.data[index].replace(component)
     }
 
     /// 指定した要素を取得する。
@@ -65,7 +61,7 @@ impl<T: Component> TypedArray<T> {
     }
 }
 
-impl<T: Component> Default for TypedArray<T> {
+impl<T> Default for TypedArray<T> {
     fn default() -> Self {
         Self::new()
     }

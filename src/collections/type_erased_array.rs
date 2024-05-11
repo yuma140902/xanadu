@@ -1,12 +1,12 @@
 use std::any::Any;
 
-use crate::{collections::TypedArray, ecs::Component};
+use crate::collections::TypedArray;
 
 pub struct TypeErasedArray {
     inner: Box<dyn Any>,
 }
 
-impl<T: Component> From<TypedArray<T>> for TypeErasedArray {
+impl<T: 'static> From<TypedArray<T>> for TypeErasedArray {
     fn from(value: TypedArray<T>) -> Self {
         Self {
             inner: Box::new(value),
@@ -15,11 +15,11 @@ impl<T: Component> From<TypedArray<T>> for TypeErasedArray {
 }
 
 impl TypeErasedArray {
-    pub fn downcast<T: Component>(&self) -> Option<&TypedArray<T>> {
+    pub fn downcast<T: 'static>(&self) -> Option<&TypedArray<T>> {
         self.inner.downcast_ref()
     }
 
-    pub fn downcast_mut<T: Component>(&mut self) -> Option<&mut TypedArray<T>> {
+    pub fn downcast_mut<T: 'static>(&mut self) -> Option<&mut TypedArray<T>> {
         self.inner.downcast_mut()
     }
 }
