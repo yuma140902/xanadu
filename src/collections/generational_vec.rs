@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 
-/// 世代型ID
+/// Generational ID for the elements of [`GenerationalVec`]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct GenerationalId {
     pub(crate) index: usize,
@@ -12,7 +12,7 @@ struct Entry<T> {
     inner: Option<T>,
 }
 
-/// 世代型IDを使って要素を管理するベクタ
+/// Vec-like collection that supports generational IDs
 pub struct GenerationalVec<T> {
     entries: Vec<Entry<T>>,
     // 空いているインデックスのキュー
@@ -21,6 +21,7 @@ pub struct GenerationalVec<T> {
 }
 
 impl<T> GenerationalVec<T> {
+    /// Create a new empty collection
     pub fn new() -> Self {
         Self {
             entries: Vec::new(),
@@ -28,6 +29,7 @@ impl<T> GenerationalVec<T> {
         }
     }
 
+    /// Create a new empty collection with a specified capacity
     pub fn with_capacity(capacity: usize) -> Self {
         Self {
             entries: Vec::with_capacity(capacity),
@@ -35,10 +37,7 @@ impl<T> GenerationalVec<T> {
         }
     }
 
-    /// リストから要素を削除する
-    ///
-    /// * `id`: 削除する要素の世代型ID
-    ///
+    /// Remove an element from the collection
     pub fn remove(&mut self, id: GenerationalId) -> Option<T> {
         if let Some(entry) = self.entries.get_mut(id.index) {
             if entry.generation == id.generation {
@@ -50,7 +49,7 @@ impl<T> GenerationalVec<T> {
         None
     }
 
-    /// 新しい要素を追加する
+    /// Add an element to the collection
     pub fn add(&mut self, value: T) -> GenerationalId {
         if let Some(index) = self.empty_queue.pop_front() {
             let generation = self.entries[index].generation + 1;
@@ -68,6 +67,7 @@ impl<T> GenerationalVec<T> {
         }
     }
 
+    /// Get a reference to an element
     pub fn get(&self, id: GenerationalId) -> Option<&T> {
         if let Some(entry) = self.entries.get(id.index) {
             if entry.generation == id.generation {
@@ -77,6 +77,7 @@ impl<T> GenerationalVec<T> {
         None
     }
 
+    /// Get a mutable reference to an element
     pub fn get_mut(&mut self, id: GenerationalId) -> Option<&mut T> {
         if let Some(entry) = self.entries.get_mut(id.index) {
             if entry.generation == id.generation {
@@ -86,10 +87,12 @@ impl<T> GenerationalVec<T> {
         None
     }
 
+    /// Get the number of elements in the collection
     pub fn len(&self) -> usize {
         self.entries.len() - self.empty_queue.len()
     }
 
+    /// Check if the collection is empty
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }

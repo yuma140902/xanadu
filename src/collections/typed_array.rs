@@ -1,6 +1,6 @@
 use std::slice;
 
-/// 型付きの配列
+/// Typed array that allows for sparse indexing
 pub struct TypedArray<T> {
     data: Vec<Option<T>>,
 }

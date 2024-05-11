@@ -2,6 +2,7 @@ use std::any::Any;
 
 use crate::collections::TypedArray;
 
+/// Type-erased version of [`TypedArray<T>`]
 pub struct TypeErasedArray {
     inner: Box<dyn Any>,
 }

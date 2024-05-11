@@ -13,7 +13,7 @@ A toy ECS library; works on Windows, macOS, Linux and WebAssembly.
 ## Usage
 
 ```rust
-use xanadu::ecs::dyn_pool::{Mut, World};
+use xanadu::ecs::{Mut, World};
 
 #[repr(C)]
 #[derive(Debug, Default, Clone, Copy, bytemuck::Pod, bytemuck::Zeroable, PartialEq)]
