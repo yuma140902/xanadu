@@ -1,20 +1,20 @@
 use std::slice;
 
-/// 型付きの配列
-pub struct TypedArray<T> {
+/// Vec-like collection that supports sparse indices
+pub struct SparseVec<T> {
     data: Vec<Option<T>>,
 }
 
-impl<T> TypedArray<T> {
+impl<T> SparseVec<T> {
     pub const fn new() -> Self {
         Self { data: Vec::new() }
     }
 
-    /// 指定されたインデックスに要素を追加する。必要に応じて配列を伸ばす。
+    /// Add an element to the collection at the specified index. Extend the array as needed.
     ///
-    /// ## Returns
+    /// # Returns
     ///
-    /// 以前の要素があればそれを返す。なければNoneを返す
+    /// Returns the previous element, if any. Otherwise, returns None.
     pub fn replace(&mut self, index: usize, component: T) -> Option<T> {
         if index >= self.data.len() {
             self.data.resize_with(index + 1, || None);
@@ -22,46 +22,46 @@ impl<T> TypedArray<T> {
         self.data[index].replace(component)
     }
 
-    /// 指定した要素を取得する。
+    /// Get an element at the specified index.
     ///
-    /// TODO: テスト
+    // TODO: テスト
     pub fn get(&self, index: usize) -> Option<&T> {
         self.data.get(index).and_then(|v| v.as_ref())
     }
 
-    /// 指定した要素を削除する。
+    /// Remove an element at the specified index, if one exists.
     ///
-    /// ## Returns
+    /// # Returns
     ///
-    /// 以前の要素があればそれをを返す。なければNoneを返す
+    /// Returns the previous element, if any. Otherwise, returns None.
     ///
-    /// TODO: テスト
+    // TODO: テスト
     pub fn remove(&mut self, index: usize) -> Option<T> {
         self.data.get_mut(index).and_then(|v| v.take())
     }
 
-    /// 有効な要素のイテレータを返す
+    /// Returns an iterator over the elements.
     pub fn iter(&self) -> impl Iterator<Item = &T> {
         self.data.iter().filter_map(|v| v.as_ref())
     }
 
-    /// 内部の配列のイテレータを返す
+    /// Returns an iterator over the internal array.
     pub fn data_iter(&self) -> slice::Iter<'_, Option<T>> {
         self.data.iter()
     }
 
-    /// 有効な要素の可変イテレータを返す
+    /// Returns a mutable iterator over the elements.
     pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
         self.data.iter_mut().filter_map(|v| v.as_mut())
     }
 
-    /// 内部の配列の可変イテレータを返す
+    /// Returns a mutable iterator over the internal array.
     pub fn data_iter_mut(&mut self) -> slice::IterMut<'_, Option<T>> {
         self.data.iter_mut()
     }
 }
 
-impl<T> Default for TypedArray<T> {
+impl<T> Default for SparseVec<T> {
     fn default() -> Self {
         Self::new()
     }
@@ -72,7 +72,7 @@ mod test {
     use super::*;
     #[test]
     fn replace() {
-        let mut array = TypedArray::new();
+        let mut array = SparseVec::new();
         array.replace(0, 42);
         assert_eq!(array.data.len(), 1);
         assert_eq!(array.data[0], Some(42));
@@ -80,7 +80,7 @@ mod test {
 
     #[test]
     fn replace_offset() {
-        let mut array = TypedArray::new();
+        let mut array = SparseVec::new();
         array.replace(0, 42);
         array.replace(2, 43);
         assert_eq!(array.data.len(), 3);
@@ -91,7 +91,7 @@ mod test {
 
     #[test]
     fn replace_return_value() {
-        let mut array = TypedArray::new();
+        let mut array = SparseVec::new();
         assert_eq!(array.replace(0, 42), None);
         assert_eq!(array.replace(0, 43), Some(42));
     }

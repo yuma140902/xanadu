@@ -1,6 +1,6 @@
 use std::{any::TypeId, collections::HashMap};
 
-use crate::collections::{GenerationalId, GenerationalVec, TypeErasedArray, TypedArray};
+use crate::collections::{GenerationalId, GenerationalVec, SparseVec, TypeErasedSparseVec};
 
 use super::{Component, Query, System};
 
@@ -33,7 +33,7 @@ impl Default for WorldBuilder {
 
 pub struct World {
     entities: GenerationalVec<()>,
-    component_arrays: HashMap<TypeId, TypeErasedArray>,
+    component_arrays: HashMap<TypeId, TypeErasedSparseVec>,
 }
 
 impl World {
@@ -46,7 +46,7 @@ impl World {
 
     pub(self) fn register_component<T: Component>(&mut self) {
         self.component_arrays
-            .insert(TypeId::of::<T>(), TypedArray::<T>::new().into());
+            .insert(TypeId::of::<T>(), SparseVec::<T>::new().into());
     }
 
     pub fn builder() -> WorldBuilder {
@@ -76,13 +76,13 @@ impl World {
         None
     }
 
-    pub fn get_component_array<T: Component>(&self) -> Option<&TypedArray<T>> {
+    pub fn get_component_array<T: Component>(&self) -> Option<&SparseVec<T>> {
         self.component_arrays
             .get(&TypeId::of::<T>())
             .and_then(|any_array| any_array.downcast::<T>())
     }
 
-    pub fn get_component_array_mut<T: Component>(&mut self) -> Option<&mut TypedArray<T>> {
+    pub fn get_component_array_mut<T: Component>(&mut self) -> Option<&mut SparseVec<T>> {
         self.component_arrays
             .get_mut(&TypeId::of::<T>())
             .and_then(|any_array| any_array.downcast_mut::<T>())
