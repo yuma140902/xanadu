@@ -1,8 +1,6 @@
 use std::any::Any;
 
-use crate::collections::TypedArray;
-
-use super::Component;
+use crate::{collections::TypedArray, ecs::Component};
 
 pub struct AnyComponentArray {
     inner: Box<dyn Any>,

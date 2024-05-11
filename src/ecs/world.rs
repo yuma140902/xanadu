@@ -1,8 +1,8 @@
 use std::{any::TypeId, collections::HashMap};
 
-use crate::collections::{GenerationalId, GenerationalVec, TypedArray};
+use crate::collections::{AnyComponentArray, GenerationalId, GenerationalVec, TypedArray};
 
-use super::{AnyComponentArray, Component, Query, System};
+use super::{Component, Query, System};
 
 pub struct WorldBuilder {
     world: World,
