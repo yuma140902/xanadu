@@ -1,6 +1,8 @@
 use std::any::Any;
 
-use super::{Component, ComponentArray};
+use crate::collections::ComponentArray;
+
+use super::Component;
 
 pub struct AnyComponentArray {
     inner: Box<dyn Any>,

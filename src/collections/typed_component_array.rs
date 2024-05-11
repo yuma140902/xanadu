@@ -1,6 +1,6 @@
-use core::slice;
+use std::slice;
 
-use super::Component;
+use crate::ecs::Component;
 
 pub struct ComponentArray<T> {
     data: Vec<Option<T>>,
