@@ -1,25 +1,25 @@
 use std::any::Any;
 
-use super::{Component, ComponentArray};
+use crate::collections::TypedArray;
 
-pub struct AnyComponentArray {
+pub struct TypeErasedArray {
     inner: Box<dyn Any>,
 }
 
-impl<T: Component> From<ComponentArray<T>> for AnyComponentArray {
-    fn from(value: ComponentArray<T>) -> Self {
+impl<T: 'static> From<TypedArray<T>> for TypeErasedArray {
+    fn from(value: TypedArray<T>) -> Self {
         Self {
             inner: Box::new(value),
         }
     }
 }
 
-impl AnyComponentArray {
-    pub fn downcast<T: Component>(&self) -> Option<&ComponentArray<T>> {
+impl TypeErasedArray {
+    pub fn downcast<T: 'static>(&self) -> Option<&TypedArray<T>> {
         self.inner.downcast_ref()
     }
 
-    pub fn downcast_mut<T: Component>(&mut self) -> Option<&mut ComponentArray<T>> {
+    pub fn downcast_mut<T: 'static>(&mut self) -> Option<&mut TypedArray<T>> {
         self.inner.downcast_mut()
     }
 }
@@ -30,16 +30,16 @@ mod test {
 
     #[test]
     fn downcast() {
-        let array = ComponentArray::<i32>::new();
-        let any_array = AnyComponentArray::from(array);
+        let array = TypedArray::<i32>::new();
+        let any_array = TypeErasedArray::from(array);
         assert!(any_array.downcast::<i32>().is_some());
         assert!(any_array.downcast::<f32>().is_none());
     }
 
     #[test]
     fn downcast_mut() {
-        let array = ComponentArray::<i32>::new();
-        let mut any_array = AnyComponentArray::from(array);
+        let array = TypedArray::<i32>::new();
+        let mut any_array = TypeErasedArray::from(array);
         assert!(any_array.downcast_mut::<i32>().is_some());
         assert!(any_array.downcast_mut::<f32>().is_none());
     }
