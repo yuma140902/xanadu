@@ -68,7 +68,7 @@ pub mod collections;
 /// # Entities
 ///
 /// Entities are unique identifiers that have no intrinsic properties on their own. They are just
-/// identities used to keep track of components attached to them. In Xanadu, entities are just
+/// identifiers used to keep track of components attached to them. In Xanadu, entities are just
 /// [`GenerationalId`](collections::GenerationalId)s.
 ///
 /// # Components
