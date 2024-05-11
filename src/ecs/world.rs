@@ -1,6 +1,6 @@
 use std::{any::TypeId, collections::HashMap};
 
-use crate::generational_vec::{GenerationalId, GenerationalVec};
+use crate::collections::{GenerationalId, GenerationalVec};
 
 use super::{AnyComponentArray, Component, ComponentArray, Query, System};
 
