@@ -1,11 +1,11 @@
 use std::slice;
 
-/// Typed array that allows for sparse indexing
-pub struct TypedArray<T> {
+/// Vec-like collection that supports sparse indices
+pub struct SparseVec<T> {
     data: Vec<Option<T>>,
 }
 
-impl<T> TypedArray<T> {
+impl<T> SparseVec<T> {
     pub const fn new() -> Self {
         Self { data: Vec::new() }
     }
@@ -61,7 +61,7 @@ impl<T> TypedArray<T> {
     }
 }
 
-impl<T> Default for TypedArray<T> {
+impl<T> Default for SparseVec<T> {
     fn default() -> Self {
         Self::new()
     }
@@ -72,7 +72,7 @@ mod test {
     use super::*;
     #[test]
     fn replace() {
-        let mut array = TypedArray::new();
+        let mut array = SparseVec::new();
         array.replace(0, 42);
         assert_eq!(array.data.len(), 1);
         assert_eq!(array.data[0], Some(42));
@@ -80,7 +80,7 @@ mod test {
 
     #[test]
     fn replace_offset() {
-        let mut array = TypedArray::new();
+        let mut array = SparseVec::new();
         array.replace(0, 42);
         array.replace(2, 43);
         assert_eq!(array.data.len(), 3);
@@ -91,7 +91,7 @@ mod test {
 
     #[test]
     fn replace_return_value() {
-        let mut array = TypedArray::new();
+        let mut array = SparseVec::new();
         assert_eq!(array.replace(0, 42), None);
         assert_eq!(array.replace(0, 43), Some(42));
     }
