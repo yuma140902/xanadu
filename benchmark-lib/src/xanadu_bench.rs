@@ -1,5 +1,5 @@
 use criterion::black_box;
-use xanadu::ecs::dyn_pool::{Mut, World};
+use xanadu::ecs::{Mut, World};
 
 use crate::{increment_system, shuffle_system, Id, OtherData, Position};
 
