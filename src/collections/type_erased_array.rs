@@ -2,11 +2,11 @@ use std::any::Any;
 
 use crate::{collections::TypedArray, ecs::Component};
 
-pub struct AnyComponentArray {
+pub struct TypeErasedArray {
     inner: Box<dyn Any>,
 }
 
-impl<T: Component> From<TypedArray<T>> for AnyComponentArray {
+impl<T: Component> From<TypedArray<T>> for TypeErasedArray {
     fn from(value: TypedArray<T>) -> Self {
         Self {
             inner: Box::new(value),
@@ -14,7 +14,7 @@ impl<T: Component> From<TypedArray<T>> for AnyComponentArray {
     }
 }
 
-impl AnyComponentArray {
+impl TypeErasedArray {
     pub fn downcast<T: Component>(&self) -> Option<&TypedArray<T>> {
         self.inner.downcast_ref()
     }
@@ -31,7 +31,7 @@ mod test {
     #[test]
     fn downcast() {
         let array = TypedArray::<i32>::new();
-        let any_array = AnyComponentArray::from(array);
+        let any_array = TypeErasedArray::from(array);
         assert!(any_array.downcast::<i32>().is_some());
         assert!(any_array.downcast::<f32>().is_none());
     }
@@ -39,7 +39,7 @@ mod test {
     #[test]
     fn downcast_mut() {
         let array = TypedArray::<i32>::new();
-        let mut any_array = AnyComponentArray::from(array);
+        let mut any_array = TypeErasedArray::from(array);
         assert!(any_array.downcast_mut::<i32>().is_some());
         assert!(any_array.downcast_mut::<f32>().is_none());
     }

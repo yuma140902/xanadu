@@ -1,6 +1,6 @@
 use std::{any::TypeId, collections::HashMap};
 
-use crate::collections::{AnyComponentArray, GenerationalId, GenerationalVec, TypedArray};
+use crate::collections::{GenerationalId, GenerationalVec, TypeErasedArray, TypedArray};
 
 use super::{Component, Query, System};
 
@@ -33,7 +33,7 @@ impl Default for WorldBuilder {
 
 pub struct World {
     entities: GenerationalVec<()>,
-    component_arrays: HashMap<TypeId, AnyComponentArray>,
+    component_arrays: HashMap<TypeId, TypeErasedArray>,
 }
 
 impl World {
