@@ -1,4 +1,4 @@
-use xanadu::ecs::{SingleComponentIter, SingleComponentIterMut, World};
+use xanadu::ecs::{SingleComponentExclusiveIterMut, SingleComponentIter, World};
 
 #[derive(Debug)]
 pub struct Position {
@@ -35,7 +35,7 @@ fn print_system(iter: SingleComponentIter<'_, Position>) {
     }
 }
 
-fn shuffle_system(iter: SingleComponentIterMut<'_, Position>) {
+fn shuffle_system(iter: SingleComponentExclusiveIterMut<'_, Position>) {
     for pos in iter {
         let tmp = pos.x;
         pos.x = pos.y;
@@ -44,7 +44,7 @@ fn shuffle_system(iter: SingleComponentIterMut<'_, Position>) {
     }
 }
 
-fn increment_system(iter: SingleComponentIterMut<'_, Position>) {
+fn increment_system(iter: SingleComponentExclusiveIterMut<'_, Position>) {
     for pos in iter {
         pos.x += 1.0;
         pos.y += 2.0;

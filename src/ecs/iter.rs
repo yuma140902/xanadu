@@ -1,35 +1,39 @@
+use std::cell::{Ref, RefMut};
+
+use crate::collections::SparseVec;
+
 use super::{Component, World};
 
 pub trait FromWorld<'world> {
     fn from_world(world: &'world mut World) -> Self;
 }
 
-pub struct SingleComponentIter<'world, C>
+pub struct SingleComponentExclusiveIter<'world, C>
 where
     C: Component,
 {
-    iter: std::slice::Iter<'world, Option<C>>,
+    iter: std::slice::IterMut<'world, Option<C>>,
 }
 
-impl<'world, C> FromWorld<'world> for SingleComponentIter<'world, C>
+impl<'world, C> FromWorld<'world> for SingleComponentExclusiveIter<'world, C>
 where
     C: Component,
 {
     fn from_world(world: &'world mut World) -> Self {
-        Self {
-            iter: world
-                .components
-                .get::<C>()
-                .map_or_else(|| [].iter(), |array| array.data_iter()),
-        }
+        let iter = world
+            .components
+            .get_exclusive_iter_mut::<C>()
+            .expect("Component not registered");
+        Self { iter }
     }
 }
 
-impl<'world, C> Iterator for SingleComponentIter<'world, C>
+impl<'world, C> Iterator for SingleComponentExclusiveIter<'world, C>
 where
     C: Component,
 {
     type Item = &'world C;
+
     fn next(&mut self) -> Option<Self::Item> {
         for item in self.iter.by_ref() {
             if item.is_some() {
@@ -40,28 +44,27 @@ where
     }
 }
 
-pub struct SingleComponentIterMut<'world, C>
+pub struct SingleComponentExclusiveIterMut<'world, C>
 where
     C: Component,
 {
     iter: std::slice::IterMut<'world, Option<C>>,
 }
 
-impl<'world, C> FromWorld<'world> for SingleComponentIterMut<'world, C>
+impl<'world, C> FromWorld<'world> for SingleComponentExclusiveIterMut<'world, C>
 where
     C: Component,
 {
     fn from_world(world: &'world mut World) -> Self {
-        Self {
-            iter: world
-                .components
-                .get_mut::<C>()
-                .map_or_else(|| [].iter_mut(), |array| array.data_iter_mut()),
-        }
+        let iter = world
+            .components
+            .get_exclusive_iter_mut::<C>()
+            .expect("Component not registered");
+        Self { iter }
     }
 }
 
-impl<'world, C> Iterator for SingleComponentIterMut<'world, C>
+impl<'world, C> Iterator for SingleComponentExclusiveIterMut<'world, C>
 where
     C: Component,
 {

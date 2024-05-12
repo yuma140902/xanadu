@@ -1,4 +1,4 @@
-use xanadu::ecs::{SingleComponentIterMut, World};
+use xanadu::ecs::{SingleComponentExclusiveIterMut, World};
 
 use crate::{black_box, increment_system, shuffle_system, Id, OtherData, Position};
 
@@ -36,13 +36,13 @@ pub fn benchmark(world: &mut World) {
     world.execute(shuffle_system_xanadu);
 }
 
-fn shuffle_system_xanadu(iter: SingleComponentIterMut<'_, Position>) {
+fn shuffle_system_xanadu(iter: SingleComponentExclusiveIterMut<'_, Position>) {
     for pos in iter {
         shuffle_system(pos);
     }
 }
 
-fn increment_system_xanadu(iter: SingleComponentIterMut<'_, Position>) {
+fn increment_system_xanadu(iter: SingleComponentExclusiveIterMut<'_, Position>) {
     for pos in iter {
         increment_system(pos);
     }
