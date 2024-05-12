@@ -15,8 +15,7 @@ A toy ECS library; works on Windows, macOS, Linux and WebAssembly.
 ```rust
 use xanadu::ecs::{SingleComponentIter, SingleComponentIterMut, World};
 
-#[repr(C)]
-#[derive(Debug, Default, Clone, Copy, bytemuck::Pod, bytemuck::Zeroable, PartialEq)]
+#[derive(Debug )]
 pub struct Position {
     pub x: f64,
     pub y: f64,

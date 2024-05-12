@@ -80,9 +80,9 @@ mod test {
     fn assert_same(hash: &HashMap<usize, GameObject>, vec: &[GameObject]) {
         for (hash_key, hash_value) in hash.iter() {
             let vec_value = vec.iter().find(|v| v.id == *hash_key).unwrap();
-            let pos = hash_value.position;
+            let pos = &hash_value.position;
             assert_eq!(pos.is_none(), vec_value.position.is_none());
-            if let (Some(pos1), Some(pos2)) = (pos, vec_value.position) {
+            if let (Some(pos1), Some(pos2)) = (pos, &vec_value.position) {
                 assert_eq!(pos1.x, pos2.x);
                 assert_eq!(pos1.y, pos2.y);
                 assert_eq!(pos1.z, pos2.z);
