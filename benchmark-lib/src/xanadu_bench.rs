@@ -83,7 +83,7 @@ mod test {
         let pos_array = world.get_component_array::<Position>().unwrap();
         for (i, pos) in pos_array.data_iter().enumerate() {
             assert_eq!(pos.is_none(), game_objects[i].position.is_none());
-            if let (Some(pos1), Some(pos2)) = (pos, game_objects[i].position) {
+            if let (Some(pos1), Some(pos2)) = (pos, &game_objects[i].position) {
                 assert_eq!(pos1.x, pos2.x);
                 assert_eq!(pos1.y, pos2.y);
                 assert_eq!(pos1.z, pos2.z);

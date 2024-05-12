@@ -6,7 +6,6 @@ edition.workspace = true
 
 [dependencies]
 bevy_ecs = "0.13.2"
-bytemuck = { version = "1.15.0", features = [ "derive" ] }
 specs = "0.20.0"
 xanadu = { path = "../" }
 

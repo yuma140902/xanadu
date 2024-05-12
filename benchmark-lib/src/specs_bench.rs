@@ -113,7 +113,7 @@ mod test {
 
         fn run(&mut self, (ids, positions, mut entities): Self::SystemData) {
             for (id, pos) in (&ids, &positions).join() {
-                entities.0.push((*id, *pos));
+                entities.0.push((id.clone(), pos.clone()));
             }
         }
     }

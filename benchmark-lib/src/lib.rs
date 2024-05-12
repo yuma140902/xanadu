@@ -4,40 +4,17 @@ pub mod game_objects_vec_bench;
 pub mod specs_bench;
 pub mod xanadu_bench;
 
-#[repr(C)]
-#[derive(
-    Debug,
-    Default,
-    Clone,
-    Copy,
-    bytemuck::Pod,
-    bytemuck::Zeroable,
-    PartialEq,
-    bevy_ecs::prelude::Component,
-)]
+#[derive(Debug, Clone, PartialEq, bevy_ecs::prelude::Component)]
 pub struct Id(usize);
 
-#[repr(C)]
-#[derive(
-    Debug,
-    Default,
-    Clone,
-    Copy,
-    bytemuck::Pod,
-    bytemuck::Zeroable,
-    PartialEq,
-    bevy_ecs::prelude::Component,
-)]
+#[derive(Debug, Clone, PartialEq, bevy_ecs::prelude::Component)]
 pub struct Position {
     pub x: f64,
     pub y: f64,
     pub z: f64,
 }
 
-#[repr(C)]
-#[derive(
-    Debug, Clone, Copy, bytemuck::Pod, bytemuck::Zeroable, PartialEq, bevy_ecs::prelude::Component,
-)]
+#[derive(Debug, bevy_ecs::prelude::Component)]
 pub struct OtherData {
     pub data: [f64; 128],
 }

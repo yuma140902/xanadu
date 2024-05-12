@@ -100,7 +100,7 @@ mod test {
 
     fn entities_system(mut query: Query<(&Id, &Position)>, mut entities: ResMut<Entities>) {
         for (id, pos) in query.iter_mut() {
-            entities.0.push((*id, *pos));
+            entities.0.push((id.clone(), pos.clone()));
         }
     }
 
@@ -114,7 +114,7 @@ mod test {
 
         for (id, pos) in entities.0.iter() {
             let game_object = vec.iter().find(|v| v.id == id.0).unwrap();
-            let game_pos = game_object.position.unwrap();
+            let game_pos = game_object.position.as_ref().unwrap();
             assert_eq!(pos.x, game_pos.x);
             assert_eq!(pos.y, game_pos.y);
             assert_eq!(pos.z, game_pos.z);
