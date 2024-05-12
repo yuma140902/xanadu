@@ -1,4 +1,6 @@
-use xanadu::ecs::{PairComponentIter, SingleComponentIter, SingleComponentIterMut, World};
+use xanadu::ecs::{
+    PairComponentIter, PairComponentIterMut, SingleComponentIter, SingleComponentIterMut, World,
+};
 
 #[repr(C)]
 #[derive(Debug, Default, Clone, Copy, bytemuck::Pod, bytemuck::Zeroable, PartialEq)]
@@ -58,7 +60,11 @@ fn main() {
     world.execute(&increment_system);
     world.execute(&shuffle_system);
     println!("Shuffled and incremented");
-    //world.execute(&print_system);
+    world.execute(&print_system);
+    println!("====================");
+    world.execute(&print2_system);
+    world.execute(&apply_force_system);
+    println!("====================");
     world.execute(&print2_system);
 }
 
@@ -91,5 +97,13 @@ fn print2_system(iter: PairComponentIter<'_, Position, Velocity>) {
             "Pos: [{}, {}, {}], Vel: [{}, {}, {}]",
             pos.x, pos.y, pos.z, vel.x, vel.y, vel.z
         );
+    }
+}
+
+fn apply_force_system(iter: PairComponentIterMut<'_, Position, Velocity>) {
+    for (pos, vel) in iter {
+        pos.x += vel.x;
+        pos.y += vel.y;
+        pos.z += vel.z;
     }
 }
