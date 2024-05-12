@@ -2,7 +2,7 @@ use std::{any::TypeId, collections::HashMap};
 
 use crate::collections::{GenerationalId, GenerationalVec, SparseVec, TypeErasedSparseVec};
 
-use super::{Component, Query, System};
+use super::{Component, System};
 
 pub struct WorldBuilder {
     world: World,
@@ -88,10 +88,7 @@ impl World {
             .and_then(|any_array| any_array.downcast_mut::<T>())
     }
 
-    pub fn execute<'world, Q, T>(&'world mut self, system: &'world impl System<'world, Q, T>)
-    where
-        Q: Query<'world, T>,
-    {
+    pub fn execute<'world, T>(&'world mut self, system: &'world impl System<'world, T>) {
         system.execute(self);
     }
 }
