@@ -18,7 +18,8 @@ where
     fn from_world(world: &'world mut World) -> Self {
         Self {
             iter: world
-                .get_component_array::<C>()
+                .components
+                .get::<C>()
                 .map_or_else(|| [].iter(), |array| array.data_iter()),
         }
     }
@@ -53,7 +54,8 @@ where
     fn from_world(world: &'world mut World) -> Self {
         Self {
             iter: world
-                .get_component_array_mut::<C>()
+                .components
+                .get_mut::<C>()
                 .map_or_else(|| [].iter_mut(), |array| array.data_iter_mut()),
         }
     }

@@ -28,12 +28,12 @@
 //!         );
 //!     }
 //!
-//!     world.execute(&print_system);
-//!     world.execute(&shuffle_system);
-//!     world.execute(&increment_system);
-//!     world.execute(&shuffle_system);
+//!     world.execute(print_system);
+//!     world.execute(shuffle_system);
+//!     world.execute(increment_system);
+//!     world.execute(shuffle_system);
 //!     println!("Shuffled and incremented");
-//!     world.execute(&print_system);
+//!     world.execute(print_system);
 //! }
 //!
 //! fn print_system(iter: SingleComponentIter<'_, Position>) {

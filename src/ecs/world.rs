@@ -16,7 +16,7 @@ impl WorldBuilder {
     }
 
     pub fn register_component<T: Component>(mut self) -> Self {
-        self.world.register_component::<T>();
+        self.world.components.register::<T>();
         self
     }
 
@@ -33,20 +33,15 @@ impl Default for WorldBuilder {
 
 pub struct World {
     entities: GenerationalVec<()>,
-    component_arrays: HashMap<TypeId, TypeErasedSparseVec>,
+    pub(crate) components: Components,
 }
 
 impl World {
     pub(self) fn new() -> Self {
         Self {
             entities: GenerationalVec::new(),
-            component_arrays: HashMap::new(),
+            components: Components::new(),
         }
-    }
-
-    pub(self) fn register_component<T: Component>(&mut self) {
-        self.component_arrays
-            .insert(TypeId::of::<T>(), SparseVec::<T>::new().into());
     }
 
     pub fn builder() -> WorldBuilder {
@@ -68,27 +63,13 @@ impl World {
         entity: GenerationalId,
         component: T,
     ) -> Option<T> {
-        if let Some(array) = self.component_arrays.get_mut(&TypeId::of::<T>()) {
-            if let Some(array) = array.downcast_mut::<T>() {
-                return array.replace(entity.index, component);
-            }
+        if let Some(array) = self.components.get_mut::<T>() {
+            return array.replace(entity.index, component);
         }
         None
     }
 
-    pub fn get_component_array<T: Component>(&self) -> Option<&SparseVec<T>> {
-        self.component_arrays
-            .get(&TypeId::of::<T>())
-            .and_then(|any_array| any_array.downcast::<T>())
-    }
-
-    pub fn get_component_array_mut<T: Component>(&mut self) -> Option<&mut SparseVec<T>> {
-        self.component_arrays
-            .get_mut(&TypeId::of::<T>())
-            .and_then(|any_array| any_array.downcast_mut::<T>())
-    }
-
-    pub fn execute<'world, T>(&'world mut self, system: &'world impl System<'world, T>) {
+    pub fn execute<'world, T>(&'world mut self, system: impl System<'world, T>) {
         system.execute(self);
     }
 }
@@ -96,6 +77,35 @@ impl World {
 impl Default for World {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+pub struct Components {
+    map: HashMap<TypeId, TypeErasedSparseVec>,
+}
+
+impl Components {
+    fn new() -> Self {
+        Self {
+            map: HashMap::new(),
+        }
+    }
+
+    fn register<T: Component>(&mut self) {
+        self.map
+            .insert(TypeId::of::<T>(), SparseVec::<T>::new().into());
+    }
+
+    pub(crate) fn get<T: Component>(&self) -> Option<&SparseVec<T>> {
+        self.map
+            .get(&TypeId::of::<T>())
+            .and_then(|any_array| any_array.downcast::<T>())
+    }
+
+    pub(crate) fn get_mut<T: Component>(&mut self) -> Option<&mut SparseVec<T>> {
+        self.map
+            .get_mut(&TypeId::of::<T>())
+            .and_then(|any_array| any_array.downcast_mut::<T>())
     }
 }
 
@@ -107,7 +117,7 @@ mod test {
     fn new() {
         let world = World::new();
         assert!(world.entities.is_empty());
-        assert!(world.component_arrays.is_empty());
+        assert!(world.components.map.is_empty());
     }
 
     #[test]
