@@ -1,7 +1,6 @@
-use criterion::black_box;
 use specs::prelude::*;
 
-use crate::{increment_system, shuffle_system, Id, OtherData, Position};
+use crate::{black_box, increment_system, shuffle_system, Id, OtherData, Position};
 
 impl Component for Id {
     type Storage = VecStorage<Self>;

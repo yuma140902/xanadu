@@ -1,7 +1,6 @@
-use criterion::black_box;
 use xanadu::ecs::{SingleComponentIterMut, World};
 
-use crate::{increment_system, shuffle_system, Id, OtherData, Position};
+use crate::{black_box, increment_system, shuffle_system, Id, OtherData, Position};
 
 pub fn setup(n: usize) -> World {
     let mut world = World::builder()
@@ -54,7 +53,13 @@ mod test {
     use super::*;
     use crate::game_objects_vec_bench;
 
+    #[cfg(target_arch = "wasm32")]
+    use wasm_bindgen_test::*;
+    #[cfg(all(target_arch = "wasm32", feature = "test_in_browser"))]
+    wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
+
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn setup_test() {
         let game_objects = game_objects_vec_bench::setup(30);
         let world = setup(30);
@@ -63,6 +68,7 @@ mod test {
     }
 
     #[test]
+    #[cfg_attr(target_arch = "wasm32", wasm_bindgen_test)]
     fn systems_test() {
         let mut game_objects = game_objects_vec_bench::setup(30);
         game_objects_vec_bench::benchmark(&mut game_objects);

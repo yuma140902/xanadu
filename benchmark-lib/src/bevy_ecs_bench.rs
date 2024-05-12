@@ -1,7 +1,6 @@
 use bevy_ecs::prelude::*;
-use criterion::black_box;
 
-use crate::{increment_system, shuffle_system, Id, OtherData, Position};
+use crate::{black_box, increment_system, shuffle_system, Id, OtherData, Position};
 
 pub fn setup(n: usize) -> (World, Schedule) {
     let mut world = World::new();
