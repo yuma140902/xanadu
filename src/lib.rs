@@ -5,7 +5,7 @@
 //! ## Example
 //!
 //! ```rust
-//! use xanadu::ecs::{Mut, World};
+//! use xanadu::ecs::{SingleComponentIter, SingleComponentIterMut, World};
 //!
 //! #[repr(C)]
 //! #[derive(Debug, Default, Clone, Copy, bytemuck::Pod, bytemuck::Zeroable, PartialEq)]
@@ -29,29 +29,35 @@
 //!         );
 //!     }
 //!
-//!     world.execute::<'_, Position, _>(&print_system);
-//!     world.execute::<'_, Mut<Position>, _>(&shuffle_system);
-//!     world.execute::<'_, Mut<Position>, _>(&increment_system);
-//!     world.execute::<'_, Mut<Position>, _>(&shuffle_system);
+//!     world.execute(&print_system);
+//!     world.execute(&shuffle_system);
+//!     world.execute(&increment_system);
+//!     world.execute(&shuffle_system);
 //!     println!("Shuffled and incremented");
-//!     world.execute::<'_, Position, _>(&print_system);
+//!     world.execute(&print_system);
 //! }
 //!
-//! fn print_system(pos: &Position) {
-//!     println!("Pos: [{}, {}, {}]", pos.x, pos.y, pos.z);
+//! fn print_system(iter: SingleComponentIter<'_, Position>) {
+//!     for pos in iter {
+//!         println!("Pos: [{}, {}, {}]", pos.x, pos.y, pos.z);
+//!     }
 //! }
 //!
-//! fn shuffle_system(pos: &mut Position) {
-//!     let tmp = pos.x;
-//!     pos.x = pos.y;
-//!     pos.y = pos.z;
-//!     pos.z = tmp;
+//! fn shuffle_system(iter: SingleComponentIterMut<'_, Position>) {
+//!     for pos in iter {
+//!         let tmp = pos.x;
+//!         pos.x = pos.y;
+//!         pos.y = pos.z;
+//!         pos.z = tmp;
+//!     }
 //! }
 //!
-//! fn increment_system(pos: &mut Position) {
-//!     pos.x += 1.0;
-//!     pos.y += 2.0;
-//!     pos.z += 3.0;
+//! fn increment_system(iter: SingleComponentIterMut<'_, Position>) {
+//!     for pos in iter {
+//!         pos.x += 1.0;
+//!         pos.y += 2.0;
+//!         pos.z += 3.0;
+//!     }
 //! }
 //! ```
 
