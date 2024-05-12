@@ -56,8 +56,8 @@ jobs:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
     - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-    - run: wasm-pack test --node --verbose
-    - run: wasm-pack test --node --verbose --release
+    - run: wasm-pack test --node           -- --workspace --verbose
+    - run: wasm-pack test --node --release -- --workspace --verbose
 
   tests-wasm-browser:
     runs-on: ubuntu-latest
@@ -69,10 +69,10 @@ jobs:
     - run: firefox --version
     - uses: browser-actions/setup-chrome@v1
     - run: chrome --version
-    - run: wasm-pack test --headless --firefox -- --features test_in_browser --verbose
-    - run: wasm-pack test --headless --firefox -- --features test_in_browser --verbose --release
-    - run: wasm-pack test --headless --chrome  -- --features test_in_browser --verbose
-    - run: wasm-pack test --headless --chrome  -- --features test_in_browser --verbose --release
+    - run: wasm-pack test --headless --firefox           -- --workspace --features test_in_browser --features benchmark-lib/test_in_browser --verbose
+    - run: wasm-pack test --headless --firefox --release -- --workspace --features test_in_browser --features benchmark-lib/test_in_browser --verbose
+    - run: wasm-pack test --headless --chrome            -- --workspace --features test_in_browser --features benchmark-lib/test_in_browser --verbose
+    - run: wasm-pack test --headless --chrome  --release -- --workspace --features test_in_browser --features benchmark-lib/test_in_browser --verbose
 
   miri:
     runs-on: ubuntu-latest
