@@ -2,7 +2,7 @@ use std::slice;
 
 /// Vec-like collection that supports sparse indices
 pub struct SparseVec<T> {
-    data: Vec<Option<T>>,
+    pub(crate) data: Vec<Option<T>>,
 }
 
 impl<T> SparseVec<T> {
