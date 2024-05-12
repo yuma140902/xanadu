@@ -1,9 +1,9 @@
 mod component;
-mod query;
+mod iter;
 mod system;
 mod world;
 
 pub use component::*;
-pub use query::*;
+pub use iter::*;
 pub use system::*;
 pub use world::*;
