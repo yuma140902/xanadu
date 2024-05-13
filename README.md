@@ -163,6 +163,6 @@ wasm-pack test --node -- --workspace
 ```
 
 ```sh
-wasm-pack test --firefox --headless -- --workspace --features test_in_browser --features benchmark-lib/test_in_browser
+wasm-pack test --firefox --headless -- --workspace --features test_in_browser --features benchmark/test_in_browser
 ```
 

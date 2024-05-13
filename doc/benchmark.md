@@ -20,4 +20,4 @@ cargo bench --workspace
 - CPU: Intel Core i7-12700
 - RAM: Samsung DDR4 3200MHz 16GB x 2
 
-code: [bench.rs](../benchmark-lib/benches/bench.rs)
+code: [bench.rs](../benchmark/benches/bench.rs)

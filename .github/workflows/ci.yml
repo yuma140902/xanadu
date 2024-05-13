@@ -71,10 +71,10 @@ jobs:
     - run: firefox --version
     - uses: browser-actions/setup-chrome@v1
     - run: chrome --version
-    - run: wasm-pack test --headless --firefox           -- --workspace --features test_in_browser --features benchmark-lib/test_in_browser --verbose
-    - run: wasm-pack test --headless --firefox --release -- --workspace --features test_in_browser --features benchmark-lib/test_in_browser --verbose
-    - run: wasm-pack test --headless --chrome            -- --workspace --features test_in_browser --features benchmark-lib/test_in_browser --verbose
-    - run: wasm-pack test --headless --chrome  --release -- --workspace --features test_in_browser --features benchmark-lib/test_in_browser --verbose
+    - run: wasm-pack test --headless --firefox           -- --workspace --features test_in_browser --features benchmark/test_in_browser --verbose
+    - run: wasm-pack test --headless --firefox --release -- --workspace --features test_in_browser --features benchmark/test_in_browser --verbose
+    - run: wasm-pack test --headless --chrome            -- --workspace --features test_in_browser --features benchmark/test_in_browser --verbose
+    - run: wasm-pack test --headless --chrome  --release -- --workspace --features test_in_browser --features benchmark/test_in_browser --verbose
 
   miri:
     runs-on: ubuntu-latest
