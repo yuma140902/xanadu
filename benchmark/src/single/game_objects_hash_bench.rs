@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use crate::{black_box, increment_system, shuffle_system, GameObject, OtherData, Position};
+use super::{increment_system, shuffle_system, GameObject, OtherData, Position};
+use crate::black_box;
 
 pub fn setup(n: usize) -> HashMap<usize, GameObject> {
     let mut game_objects = HashMap::with_capacity(n);
@@ -50,7 +51,7 @@ pub fn benchmark(game_objects: &mut HashMap<usize, GameObject>) {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::game_objects_vec_bench;
+    use crate::single::game_objects_vec_bench;
 
     #[cfg(target_arch = "wasm32")]
     use wasm_bindgen_test::*;

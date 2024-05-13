@@ -1,6 +1,7 @@
 use specs::prelude::*;
 
-use crate::{black_box, increment_system, shuffle_system, Id, OtherData, Position};
+use super::{increment_system, shuffle_system, Id, OtherData, Position};
+use crate::black_box;
 
 impl Component for Id {
     type Storage = VecStorage<Self>;
@@ -78,7 +79,7 @@ pub fn benchmark(world: &mut World, dispatcher: &mut Dispatcher<'static, 'static
 mod test {
 
     use super::*;
-    use crate::{game_objects_vec_bench, GameObject};
+    use crate::single::{game_objects_vec_bench, GameObject};
 
     #[test]
     fn setup_test() {

@@ -1,4 +1,5 @@
-use crate::{black_box, increment_system, shuffle_system, GameObject, OtherData, Position};
+use super::{increment_system, shuffle_system, GameObject, OtherData, Position};
+use crate::black_box;
 
 pub fn setup(n: usize) -> Vec<GameObject> {
     let mut game_objects = Vec::with_capacity(n);

@@ -1,6 +1,7 @@
 use bevy_ecs::prelude::*;
 
-use crate::{black_box, increment_system, shuffle_system, Id, OtherData, Position};
+use super::{increment_system, shuffle_system, Id, OtherData, Position};
+use crate::black_box;
 
 pub fn setup(n: usize) -> (World, Schedule) {
     let mut world = World::new();
@@ -27,7 +28,7 @@ pub fn setup(n: usize) -> (World, Schedule) {
         } else if i % 3 == 0 {
             world.spawn((Id(i), OtherData::default()));
         } else {
-            world.spawn(());
+            world.spawn((Id(i),));
         }
     }
 
@@ -68,7 +69,7 @@ fn increment_system_bevy(mut query: Query<(&mut Position,)>) {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{game_objects_vec_bench, GameObject, Id};
+    use crate::single::{game_objects_vec_bench, GameObject, Id};
 
     #[test]
     fn setup_test() {
@@ -94,7 +95,7 @@ mod test {
     impl Resource for Entities {}
     impl FromWorld for Entities {
         fn from_world(_world: &mut World) -> Self {
-            Entities(Vec::new())
+            Self(Vec::new())
         }
     }
 
