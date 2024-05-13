@@ -1,6 +1,7 @@
-use xanadu::ecs::{SingleComponentExclusiveIterMut, World};
+use xanadu::ecs::{SingleComponentRefIterMut, World};
 
-use crate::{black_box, increment_system, shuffle_system, Id, OtherData, Position};
+use super::{increment_system_refmut, shuffle_system_refmut, Id, OtherData, Position};
+use crate::black_box;
 
 pub fn setup(n: usize) -> World {
     let mut world = World::builder()
@@ -36,22 +37,22 @@ pub fn benchmark(world: &mut World) {
     world.execute(shuffle_system_xanadu);
 }
 
-fn shuffle_system_xanadu(iter: SingleComponentExclusiveIterMut<'_, Position>) {
-    for pos in iter {
-        shuffle_system(pos);
+fn shuffle_system_xanadu(iter: SingleComponentRefIterMut<'_, Position>) {
+    for mut pos in iter {
+        shuffle_system_refmut(&mut pos);
     }
 }
 
-fn increment_system_xanadu(iter: SingleComponentExclusiveIterMut<'_, Position>) {
-    for pos in iter {
-        increment_system(pos);
+fn increment_system_xanadu(iter: SingleComponentRefIterMut<'_, Position>) {
+    for mut pos in iter {
+        increment_system_refmut(&mut pos);
     }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::game_objects_vec_bench;
+    use crate::single::game_objects_vec_bench;
 
     #[cfg(target_arch = "wasm32")]
     use wasm_bindgen_test::*;

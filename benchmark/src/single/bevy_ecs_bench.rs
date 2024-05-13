@@ -1,6 +1,7 @@
 use bevy_ecs::prelude::*;
 
-use crate::{black_box, increment_system, shuffle_system, Id, OtherData, Position};
+use super::{increment_system, shuffle_system, Id, OtherData, Position};
+use crate::black_box;
 
 pub fn setup(n: usize) -> (World, Schedule) {
     let mut world = World::new();
@@ -68,7 +69,7 @@ fn increment_system_bevy(mut query: Query<(&mut Position,)>) {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::{game_objects_vec_bench, GameObject, Id};
+    use crate::single::{game_objects_vec_bench, GameObject, Id};
 
     #[test]
     fn setup_test() {
