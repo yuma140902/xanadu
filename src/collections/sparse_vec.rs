@@ -1,5 +1,3 @@
-use std::slice;
-
 /// Vec-like collection that supports sparse indices
 pub struct SparseVec<T> {
     data: Vec<Option<T>>,
@@ -29,6 +27,10 @@ impl<T> SparseVec<T> {
         self.data.get(index).and_then(|v| v.as_ref())
     }
 
+    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+        self.data.get_mut(index).and_then(|v| v.as_mut())
+    }
+
     /// Remove an element at the specified index, if one exists.
     ///
     /// # Returns
@@ -45,19 +47,21 @@ impl<T> SparseVec<T> {
         self.data.iter().filter_map(|v| v.as_ref())
     }
 
-    /// Returns an iterator over the internal array.
-    pub fn data_iter(&self) -> slice::Iter<'_, Option<T>> {
-        self.data.iter()
-    }
-
     /// Returns a mutable iterator over the elements.
     pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut T> {
         self.data.iter_mut().filter_map(|v| v.as_mut())
     }
 
-    /// Returns a mutable iterator over the internal array.
-    pub fn data_iter_mut(&mut self) -> slice::IterMut<'_, Option<T>> {
+    pub(crate) fn data_iter_mut(&mut self) -> std::slice::IterMut<'_, Option<T>> {
         self.data.iter_mut()
+    }
+
+    pub(crate) fn data_slice(&self) -> &[Option<T>] {
+        &self.data
+    }
+
+    pub(crate) fn data_mut_slice(&mut self) -> &mut [Option<T>] {
+        &mut self.data
     }
 }
 

@@ -1,4 +1,9 @@
-use std::{any::TypeId, collections::HashMap};
+use std::{
+    any::TypeId,
+    borrow::BorrowMut,
+    cell::{Ref, RefCell, RefMut},
+    collections::HashMap,
+};
 
 use crate::collections::{GenerationalId, GenerationalVec, SparseVec, TypeErasedSparseVec};
 
@@ -16,7 +21,7 @@ impl WorldBuilder {
     }
 
     pub fn register_component<T: Component>(mut self) -> Self {
-        self.world.register_component::<T>();
+        self.world.components.register::<T>();
         self
     }
 
@@ -33,20 +38,15 @@ impl Default for WorldBuilder {
 
 pub struct World {
     entities: GenerationalVec<()>,
-    component_arrays: HashMap<TypeId, TypeErasedSparseVec>,
+    pub(crate) components: Components,
 }
 
 impl World {
     pub(self) fn new() -> Self {
         Self {
             entities: GenerationalVec::new(),
-            component_arrays: HashMap::new(),
+            components: Components::new(),
         }
-    }
-
-    pub(self) fn register_component<T: Component>(&mut self) {
-        self.component_arrays
-            .insert(TypeId::of::<T>(), SparseVec::<T>::new().into());
     }
 
     pub fn builder() -> WorldBuilder {
@@ -68,27 +68,13 @@ impl World {
         entity: GenerationalId,
         component: T,
     ) -> Option<T> {
-        if let Some(array) = self.component_arrays.get_mut(&TypeId::of::<T>()) {
-            if let Some(array) = array.downcast_mut::<T>() {
-                return array.replace(entity.index, component);
-            }
+        if let Some(mut array) = self.components.borrow_mut::<T>() {
+            return array.borrow_mut().replace(entity.index, component);
         }
         None
     }
 
-    pub fn get_component_array<T: Component>(&self) -> Option<&SparseVec<T>> {
-        self.component_arrays
-            .get(&TypeId::of::<T>())
-            .and_then(|any_array| any_array.downcast::<T>())
-    }
-
-    pub fn get_component_array_mut<T: Component>(&mut self) -> Option<&mut SparseVec<T>> {
-        self.component_arrays
-            .get_mut(&TypeId::of::<T>())
-            .and_then(|any_array| any_array.downcast_mut::<T>())
-    }
-
-    pub fn execute<'world, T>(&'world mut self, system: &'world impl System<'world, T>) {
+    pub fn execute<'world, T>(&'world mut self, system: impl System<'world, T>) {
         system.execute(self);
     }
 }
@@ -96,6 +82,66 @@ impl World {
 impl Default for World {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+pub struct Components {
+    map: HashMap<TypeId, RefCell<TypeErasedSparseVec>>,
+}
+
+impl Components {
+    fn new() -> Self {
+        Self {
+            map: HashMap::new(),
+        }
+    }
+
+    fn register<T: Component>(&mut self) {
+        self.map.insert(
+            TypeId::of::<T>(),
+            RefCell::new(SparseVec::<T>::new().into()),
+        );
+    }
+
+    pub(crate) fn get_exclusive_iter_mut<T: Component>(
+        &mut self,
+    ) -> Option<std::slice::IterMut<'_, Option<T>>> {
+        let refcell = self.map.get_mut(&TypeId::of::<T>())?;
+        let optional_vec = refcell.get_mut().downcast_mut::<T>();
+        // SAFETY:
+        // self.map[TypeId::of<T>] には SparseVec<T> が登録されているので、ダウンキャストは必ず成功する
+        let vec = unsafe { optional_vec.unwrap_unchecked() };
+        Some(vec.data_iter_mut())
+    }
+
+    pub(crate) fn borrow_slice<T: Component>(&self) -> Option<Ref<[Option<T>]>> {
+        let refcell = self.map.get(&TypeId::of::<T>())?;
+        let slice = Ref::map(refcell.borrow(), |vec| {
+            // SAFETY:
+            // self.map[TypeId::of<T>] には SparseVec<T> が登録されているので、ダウンキャストは必ず成功する
+            unsafe { vec.downcast::<T>().unwrap_unchecked() }.data_slice()
+        });
+        Some(slice)
+    }
+
+    pub(crate) fn borrow_mut_slice<T: Component>(&self) -> Option<RefMut<[Option<T>]>> {
+        let refcell = self.map.get(&TypeId::of::<T>())?;
+        let slice = RefMut::map(refcell.borrow_mut(), |vec| {
+            // SAFETY:
+            // self.map[TypeId::of<T>] には SparseVec<T> が登録されているので、ダウンキャストは必ず成功する
+            unsafe { vec.downcast_mut::<T>().unwrap_unchecked() }.data_mut_slice()
+        });
+        Some(slice)
+    }
+
+    pub(crate) fn borrow_mut<T: Component>(&self) -> Option<RefMut<SparseVec<T>>> {
+        let refcell = self.map.get(&TypeId::of::<T>())?;
+        let vec = RefMut::map(refcell.borrow_mut(), |vec| {
+            // SAFETY:
+            // self.map[TypeId::of<T>] には SparseVec<T> が登録されているので、ダウンキャストは必ず成功する
+            unsafe { vec.downcast_mut::<T>().unwrap_unchecked() }
+        });
+        Some(vec)
     }
 }
 
@@ -107,7 +153,7 @@ mod test {
     fn new() {
         let world = World::new();
         assert!(world.entities.is_empty());
-        assert!(world.component_arrays.is_empty());
+        assert!(world.components.map.is_empty());
     }
 
     #[test]

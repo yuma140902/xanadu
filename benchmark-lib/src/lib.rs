@@ -1,8 +1,11 @@
+use std::cell::RefMut;
+
 pub mod bevy_ecs_bench;
 pub mod game_objects_hash_bench;
 pub mod game_objects_vec_bench;
 pub mod specs_bench;
-pub mod xanadu_bench;
+pub mod xanadu_exclusive_bench;
+pub mod xanadu_refcell_bench;
 
 #[derive(Debug, Clone, PartialEq, bevy_ecs::prelude::Component)]
 pub struct Id(usize);
@@ -38,7 +41,20 @@ pub fn shuffle_system(pos: &mut Position) {
     pos.z = tmp;
 }
 
+pub fn shuffle_system_refmut(pos: &mut RefMut<Position>) {
+    let tmp = pos.x;
+    pos.x = pos.y;
+    pos.y = pos.z;
+    pos.z = tmp;
+}
+
 pub fn increment_system(pos: &mut Position) {
+    pos.x += black_box(1.0);
+    pos.y += black_box(2.0);
+    pos.z += black_box(3.0);
+}
+
+pub fn increment_system_refmut(pos: &mut RefMut<Position>) {
     pos.x += black_box(1.0);
     pos.y += black_box(2.0);
     pos.z += black_box(3.0);
