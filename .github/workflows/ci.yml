@@ -30,8 +30,8 @@ jobs:
     - uses: dtolnay/rust-toolchain@stable
       with:
         components: clippy
-    - run: cargo clippy --all-targets --verbose           -- -Dclippy::all -Dclippy::nursery -Dwarnings
-    - run: cargo clippy --all-targets --verbose --release -- -Dclippy::all -Dclippy::nursery -Dwarnings
+    - run: cargo clippy --workspace --verbose           -- -Dclippy::all -Dclippy::nursery -Dwarnings
+    - run: cargo clippy --workspace --verbose --release -- -Dclippy::all -Dclippy::nursery -Dwarnings
 
   doc:
     runs-on: ubuntu-latest
