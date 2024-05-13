@@ -1,5 +1,3 @@
-use std::slice;
-
 /// Vec-like collection that supports sparse indices
 pub struct SparseVec<T> {
     data: Vec<Option<T>>,
@@ -56,6 +54,10 @@ impl<T> SparseVec<T> {
 
     pub(crate) fn data_iter_mut(&mut self) -> std::slice::IterMut<'_, Option<T>> {
         self.data.iter_mut()
+    }
+
+    pub(crate) fn data_slice(&self) -> &[Option<T>] {
+        &self.data
     }
 
     pub(crate) fn data_mut_slice(&mut self) -> &mut [Option<T>] {

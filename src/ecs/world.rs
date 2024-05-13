@@ -1,7 +1,7 @@
 use std::{
     any::TypeId,
     borrow::BorrowMut,
-    cell::{RefCell, RefMut},
+    cell::{Ref, RefCell, RefMut},
     collections::HashMap,
 };
 
@@ -112,6 +112,16 @@ impl Components {
         // self.map[TypeId::of<T>] には SparseVec<T> が登録されているので、ダウンキャストは必ず成功する
         let vec = unsafe { optional_vec.unwrap_unchecked() };
         Some(vec.data_iter_mut())
+    }
+
+    pub(crate) fn borrow_slice<T: Component>(&self) -> Option<Ref<[Option<T>]>> {
+        let refcell = self.map.get(&TypeId::of::<T>())?;
+        let slice = Ref::map(refcell.borrow(), |vec| {
+            // SAFETY:
+            // self.map[TypeId::of<T>] には SparseVec<T> が登録されているので、ダウンキャストは必ず成功する
+            unsafe { vec.downcast::<T>().unwrap_unchecked() }.data_slice()
+        });
+        Some(slice)
     }
 
     pub(crate) fn borrow_mut_slice<T: Component>(&self) -> Option<RefMut<[Option<T>]>> {

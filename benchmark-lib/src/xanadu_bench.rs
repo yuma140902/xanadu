@@ -55,7 +55,7 @@ mod test {
 
     #[cfg(target_arch = "wasm32")]
     use wasm_bindgen_test::*;
-    use xanadu::ecs::SingleComponentIter;
+    use xanadu::ecs::SingleComponentExclusiveIter;
     #[cfg(all(target_arch = "wasm32", feature = "test_in_browser"))]
     wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
@@ -82,7 +82,7 @@ mod test {
 
     fn assert_same(game_objects: &[crate::GameObject], world: &mut World) {
         let mut positions = Vec::new();
-        world.execute(|iter: SingleComponentIter<'_, Position>| {
+        world.execute(|iter: SingleComponentExclusiveIter<'_, Position>| {
             for pos in iter {
                 positions.push(pos.clone());
             }

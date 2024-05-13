@@ -1,4 +1,4 @@
-use xanadu::ecs::{SingleComponentExclusiveIterMut, SingleComponentIter, World};
+use xanadu::ecs::{SingleComponentExclusiveIter, SingleComponentExclusiveIterMut, World};
 
 #[derive(Debug)]
 pub struct Position {
@@ -29,7 +29,7 @@ fn main() {
     world.execute(print_system);
 }
 
-fn print_system(iter: SingleComponentIter<'_, Position>) {
+fn print_system(iter: SingleComponentExclusiveIter<'_, Position>) {
     for pos in iter {
         println!("Pos: [{}, {}, {}]", pos.x, pos.y, pos.z);
     }
