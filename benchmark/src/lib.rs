@@ -7,7 +7,7 @@ pub mod specs_bench;
 pub mod xanadu_exclusive_bench;
 pub mod xanadu_refcell_bench;
 
-#[derive(Debug, Clone, PartialEq, bevy_ecs::prelude::Component)]
+#[derive(Debug, Clone, PartialEq, Eq, bevy_ecs::prelude::Component)]
 pub struct Id(usize);
 
 #[derive(Debug, Clone, PartialEq, bevy_ecs::prelude::Component)]
