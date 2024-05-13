@@ -77,68 +77,11 @@ where
     }
 }
 
-struct SparseSingleComponentRefIter<'world, C>
-where
-    C: Component,
-{
-    slice: Option<Ref<'world, [Option<C>]>>,
-}
-
-impl<'world, C> Iterator for SparseSingleComponentRefIter<'world, C>
-where
-    C: Component,
-{
-    type Item = Ref<'world, Option<C>>;
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.slice.take() {
-            Some(borrow) => match *borrow {
-                [] => None,
-                [_, ..] => {
-                    let (head, tail) = Ref::map_split(borrow, |slice| (&slice[0], &slice[1..]));
-                    self.slice.replace(tail);
-                    Some(head)
-                }
-            },
-            None => None,
-        }
-    }
-}
-
-struct SparseSingleComponentRefIterMut<'world, C>
-where
-    C: Component,
-{
-    slice: Option<RefMut<'world, [Option<C>]>>,
-}
-
-impl<'world, C> Iterator for SparseSingleComponentRefIterMut<'world, C>
-where
-    C: Component,
-{
-    type Item = RefMut<'world, Option<C>>;
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.slice.take() {
-            Some(borrow) => match *borrow {
-                [] => None,
-                [_, ..] => {
-                    let (head, tail) = RefMut::map_split(borrow, |slice| {
-                        let (left, right) = slice.split_at_mut(1);
-                        (&mut left[0], right)
-                    });
-                    self.slice.replace(tail);
-                    Some(head)
-                }
-            },
-            None => None,
-        }
-    }
-}
-
 pub struct SingleComponentRefIter<'world, C>
 where
     C: Component,
 {
-    iter: SparseSingleComponentRefIter<'world, C>,
+    slice: Option<Ref<'world, [Option<C>]>>,
 }
 
 impl<'world, C> FromWorld<'world> for SingleComponentRefIter<'world, C>
@@ -150,9 +93,7 @@ where
             .components
             .borrow_slice::<C>()
             .expect("Component not registered");
-        Self {
-            iter: SparseSingleComponentRefIter { slice: Some(slice) },
-        }
+        Self { slice: Some(slice) }
     }
 }
 
@@ -162,12 +103,26 @@ where
 {
     type Item = Ref<'world, C>;
     fn next(&mut self) -> Option<Self::Item> {
-        for item in self.iter.by_ref() {
-            if item.is_some() {
-                return Some(Ref::map(item, |v| v.as_ref().unwrap()));
+        loop {
+            match self.slice.take() {
+                Some(borrow) => match *borrow {
+                    [] => return None,
+                    [_, ..] => {
+                        let (head, tail) = Ref::map_split(borrow, |slice| (&slice[0], &slice[1..]));
+                        self.slice.replace(tail);
+                        if head.is_some() {
+                            return Some(Ref::map(head, |v| {
+                                // SAFETY: head is Some
+                                unsafe { v.as_ref().unwrap_unchecked() }
+                            }));
+                        } else {
+                            continue;
+                        }
+                    }
+                },
+                None => return None,
             }
         }
-        None
     }
 }
 
@@ -175,7 +130,7 @@ pub struct SingleComponentRefIterMut<'world, C>
 where
     C: Component,
 {
-    iter: SparseSingleComponentRefIterMut<'world, C>,
+    slice: Option<RefMut<'world, [Option<C>]>>,
 }
 
 impl<'world, C> FromWorld<'world> for SingleComponentRefIterMut<'world, C>
@@ -187,9 +142,7 @@ where
             .components
             .borrow_mut_slice::<C>()
             .expect("Component not registered");
-        Self {
-            iter: SparseSingleComponentRefIterMut { slice: Some(slice) },
-        }
+        Self { slice: Some(slice) }
     }
 }
 
@@ -199,11 +152,28 @@ where
 {
     type Item = RefMut<'world, C>;
     fn next(&mut self) -> Option<Self::Item> {
-        for item in self.iter.by_ref() {
-            if item.is_some() {
-                return Some(RefMut::map(item, |v| v.as_mut().unwrap()));
+        loop {
+            match self.slice.take() {
+                Some(borrow) => match *borrow {
+                    [] => return None,
+                    [_, ..] => {
+                        let (head, tail) = RefMut::map_split(borrow, |slice| {
+                            let (left, right) = slice.split_at_mut(1);
+                            (&mut left[0], right)
+                        });
+                        self.slice.replace(tail);
+                        if head.is_some() {
+                            return Some(RefMut::map(head, |v| {
+                                // SAFETY: head is Some
+                                unsafe { v.as_mut().unwrap_unchecked() }
+                            }));
+                        } else {
+                            continue;
+                        }
+                    }
+                },
+                None => return None,
             }
         }
-        None
     }
 }
