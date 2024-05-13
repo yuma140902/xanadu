@@ -28,7 +28,7 @@ pub fn setup(n: usize) -> (World, Schedule) {
         } else if i % 3 == 0 {
             world.spawn((Id(i), OtherData::default()));
         } else {
-            world.spawn(());
+            world.spawn((Id(i),));
         }
     }
 

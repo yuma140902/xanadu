@@ -52,11 +52,11 @@ fn increment_system_xanadu(iter: SingleComponentExclusiveIterMut<'_, Position>) 
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::single::game_objects_vec_bench;
+    use crate::single::{game_objects_vec_bench, GameObject};
+    use xanadu::ecs::SingleComponentExclusiveIter;
 
     #[cfg(target_arch = "wasm32")]
     use wasm_bindgen_test::*;
-    use xanadu::ecs::SingleComponentExclusiveIter;
     #[cfg(all(target_arch = "wasm32", feature = "test_in_browser"))]
     wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
@@ -81,7 +81,7 @@ mod test {
         assert_same(&game_objects, &mut world);
     }
 
-    fn assert_same(game_objects: &[crate::GameObject], world: &mut World) {
+    fn assert_same(game_objects: &[GameObject], world: &mut World) {
         let mut positions = Vec::new();
         world.execute(|iter: SingleComponentExclusiveIter<'_, Position>| {
             for pos in iter {
