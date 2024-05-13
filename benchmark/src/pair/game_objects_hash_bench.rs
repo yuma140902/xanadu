@@ -21,9 +21,9 @@ pub fn setup(n: usize) -> HashMap<usize, GameObject> {
                 },
                 velocity: if (i / 10) % 4 != 0 {
                     Some(Velocity {
-                        x: black_box(i as f64) * 5.0 + 3.0,
-                        y: black_box(i as f64) * 5.0 + 2.0,
-                        z: black_box(i as f64) * 5.0 + 1.0,
+                        x: black_box(i as f64).mul_add(5.0, 3.0),
+                        y: black_box(i as f64).mul_add(5.0, 2.0),
+                        z: black_box(i as f64).mul_add(5.0, 1.0),
                     })
                 } else {
                     None

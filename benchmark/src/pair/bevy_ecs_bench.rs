@@ -15,9 +15,9 @@ pub fn setup(n: usize) -> (World, Schedule) {
                     z: black_box(i as f64) + 1.0,
                 },
                 Velocity {
-                    x: black_box(i as f64) * 5.0 + 3.0,
-                    y: black_box(i as f64) * 5.0 + 2.0,
-                    z: black_box(i as f64) * 5.0 + 1.0,
+                    x: black_box(i as f64).mul_add(5.0, 3.0),
+                    y: black_box(i as f64).mul_add(5.0, 2.0),
+                    z: black_box(i as f64).mul_add(5.0, 1.0),
                 },
             ));
         } else if (i / 10) % 3 != 0 {
@@ -33,9 +33,9 @@ pub fn setup(n: usize) -> (World, Schedule) {
             world.spawn((
                 Id(i),
                 Velocity {
-                    x: black_box(i as f64) * 5.0 + 3.0,
-                    y: black_box(i as f64) * 5.0 + 2.0,
-                    z: black_box(i as f64) * 5.0 + 1.0,
+                    x: black_box(i as f64).mul_add(5.0, 3.0),
+                    y: black_box(i as f64).mul_add(5.0, 2.0),
+                    z: black_box(i as f64).mul_add(5.0, 1.0),
                 },
             ));
         } else {
@@ -107,14 +107,14 @@ mod test {
     impl Resource for EntitiesWithPos {}
     impl FromWorld for EntitiesWithPos {
         fn from_world(_world: &mut World) -> Self {
-            EntitiesWithPos(Vec::new())
+            Self(Vec::new())
         }
     }
 
     impl Resource for EntitiesWithVel {}
     impl FromWorld for EntitiesWithVel {
         fn from_world(_world: &mut World) -> Self {
-            EntitiesWithVel(Vec::new())
+            Self(Vec::new())
         }
     }
 

@@ -95,7 +95,7 @@ mod test {
     impl Resource for Entities {}
     impl FromWorld for Entities {
         fn from_world(_world: &mut World) -> Self {
-            Entities(Vec::new())
+            Self(Vec::new())
         }
     }
 

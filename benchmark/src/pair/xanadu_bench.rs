@@ -27,9 +27,9 @@ pub fn setup(n: usize) -> World {
             world.attach_component(
                 entity,
                 Velocity {
-                    x: black_box(i as f64) * 5.0 + 3.0,
-                    y: black_box(i as f64) * 5.0 + 2.0,
-                    z: black_box(i as f64) * 5.0 + 1.0,
+                    x: black_box(i as f64).mul_add(5.0, 3.0),
+                    y: black_box(i as f64).mul_add(5.0, 2.0),
+                    z: black_box(i as f64).mul_add(5.0, 1.0),
                 },
             );
         }
@@ -45,8 +45,8 @@ pub fn benchmark(world: &mut World) {
 }
 
 fn apply_velocity_system_xanadu(iter: PairComponentsRefIterMut<'_, Position, Velocity>) {
-    for (mut pos, mut vel) in iter {
-        apply_velocity_system_refcell(&mut pos, &mut vel)
+    for (mut pos, vel) in iter {
+        apply_velocity_system_refcell(&mut pos, &vel)
     }
 }
 
