@@ -8,7 +8,9 @@ A toy ECS library; works on Windows, macOS, Linux and WebAssembly.
 
 ## Benchmark
 
-[Benchmark result](./doc/benchmark.md)
+```sh
+cargo bench --workspace
+```
 
 ## Usage
 
