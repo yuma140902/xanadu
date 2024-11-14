@@ -58,6 +58,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
     - run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
     - run: wasm-pack test --node           -- --workspace --verbose
     - run: wasm-pack test --node --release -- --workspace --verbose
