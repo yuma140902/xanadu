@@ -37,7 +37,7 @@ pub fn apply_velocity_system(pos: &mut Position, vel: &Velocity) {
     pos.z += vel.z;
 }
 
-pub fn apply_velocity_system_refcell(pos: &mut RefMut<Position>, vel: &RefMut<Velocity>) {
+pub fn apply_velocity_system_refcell(pos: &mut RefMut<'_, Position>, vel: &RefMut<'_, Velocity>) {
     pos.x += vel.x;
     pos.y += vel.y;
     pos.z += vel.z;

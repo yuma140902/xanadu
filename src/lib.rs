@@ -1,3 +1,7 @@
+#![deny(rust_2018_idioms)]
+#![deny(clippy::all)]
+#![deny(clippy::nursery)]
+
 //! # Xanadu
 //!
 //! Xanadu is a toy ECS library which works on Windows, Linux, macOS and WebAssembly.

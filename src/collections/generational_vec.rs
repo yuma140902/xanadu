@@ -22,7 +22,7 @@ pub struct GenerationalVec<T> {
 
 impl<T> GenerationalVec<T> {
     /// Create a new empty collection
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             entries: Vec::new(),
             empty_queue: VecDeque::new(),

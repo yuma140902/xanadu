@@ -42,7 +42,7 @@ pub fn shuffle_system(pos: &mut Position) {
     pos.z = tmp;
 }
 
-pub fn shuffle_system_refmut(pos: &mut RefMut<Position>) {
+pub fn shuffle_system_refmut(pos: &mut RefMut<'_, Position>) {
     let tmp = pos.x;
     pos.x = pos.y;
     pos.y = pos.z;
@@ -55,7 +55,7 @@ pub fn increment_system(pos: &mut Position) {
     pos.z += black_box(3.0);
 }
 
-pub fn increment_system_refmut(pos: &mut RefMut<Position>) {
+pub fn increment_system_refmut(pos: &mut RefMut<'_, Position>) {
     pos.x += black_box(1.0);
     pos.y += black_box(2.0);
     pos.z += black_box(3.0);

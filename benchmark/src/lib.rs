@@ -1,3 +1,7 @@
+#![deny(rust_2018_idioms)]
+#![deny(clippy::all)]
+#![deny(clippy::nursery)]
+
 pub mod pair;
 pub mod single;
 

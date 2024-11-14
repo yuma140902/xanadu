@@ -114,7 +114,7 @@ impl Components {
         Some(vec.data_iter_mut())
     }
 
-    pub(crate) fn borrow_slice<T: Component>(&self) -> Option<Ref<[Option<T>]>> {
+    pub(crate) fn borrow_slice<T: Component>(&self) -> Option<Ref<'_, [Option<T>]>> {
         let refcell = self.map.get(&TypeId::of::<T>())?;
         let slice = Ref::map(refcell.borrow(), |vec| {
             // SAFETY:
@@ -124,7 +124,7 @@ impl Components {
         Some(slice)
     }
 
-    pub(crate) fn borrow_mut_slice<T: Component>(&self) -> Option<RefMut<[Option<T>]>> {
+    pub(crate) fn borrow_mut_slice<T: Component>(&self) -> Option<RefMut<'_, [Option<T>]>> {
         let refcell = self.map.get(&TypeId::of::<T>())?;
         let slice = RefMut::map(refcell.borrow_mut(), |vec| {
             // SAFETY:
@@ -134,7 +134,7 @@ impl Components {
         Some(slice)
     }
 
-    pub(crate) fn borrow_mut<T: Component>(&self) -> Option<RefMut<SparseVec<T>>> {
+    pub(crate) fn borrow_mut<T: Component>(&self) -> Option<RefMut<'_, SparseVec<T>>> {
         let refcell = self.map.get(&TypeId::of::<T>())?;
         let vec = RefMut::map(refcell.borrow_mut(), |vec| {
             // SAFETY:
