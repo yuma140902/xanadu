@@ -59,19 +59,19 @@ pub fn benchmark(world: &mut World, schedule: &mut Schedule) {
     schedule.run(world);
 }
 
-fn decay_velocity_system_bevy1(mut query: Query<(&mut Velocity,)>) {
+fn decay_velocity_system_bevy1(mut query: Query<'_, '_, (&mut Velocity,)>) {
     for (mut vel,) in query.iter_mut() {
         decay_velocity_system(&mut vel);
     }
 }
 
-fn decay_velocity_system_bevy2(mut query: Query<(&mut Velocity,)>) {
+fn decay_velocity_system_bevy2(mut query: Query<'_, '_, (&mut Velocity,)>) {
     for (mut vel,) in query.iter_mut() {
         decay_velocity_system(&mut vel);
     }
 }
 
-fn apply_velocity_system_bevy(mut query: Query<(&mut Position, &Velocity)>) {
+fn apply_velocity_system_bevy(mut query: Query<'_, '_, (&mut Position, &Velocity)>) {
     for (mut pos, vel) in query.iter_mut() {
         apply_velocity_system(&mut pos, vel);
     }
@@ -119,8 +119,8 @@ mod test {
     }
 
     fn entities_with_pos_system(
-        mut query: Query<(&Id, &Position)>,
-        mut entities: ResMut<EntitiesWithPos>,
+        mut query: Query<'_, '_, (&Id, &Position)>,
+        mut entities: ResMut<'_, EntitiesWithPos>,
     ) {
         for (id, pos) in query.iter_mut() {
             entities.0.push((id.clone(), pos.clone()));
@@ -128,8 +128,8 @@ mod test {
     }
 
     fn entities_with_vel_system(
-        mut query: Query<(&Id, &Velocity)>,
-        mut entities: ResMut<EntitiesWithVel>,
+        mut query: Query<'_, '_, (&Id, &Velocity)>,
+        mut entities: ResMut<'_, EntitiesWithVel>,
     ) {
         for (id, vel) in query.iter_mut() {
             entities.0.push((id.clone(), vel.clone()));

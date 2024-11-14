@@ -48,19 +48,19 @@ pub fn benchmark(world: &mut World, schedule: &mut Schedule) {
     schedule.run(world);
 }
 
-fn shuffle_system_bevy1(mut query: Query<(&mut Position,)>) {
+fn shuffle_system_bevy1(mut query: Query<'_, '_, (&mut Position,)>) {
     for (mut pos,) in query.iter_mut() {
         shuffle_system(&mut pos);
     }
 }
 
-fn shuffle_system_bevy2(mut query: Query<(&mut Position,)>) {
+fn shuffle_system_bevy2(mut query: Query<'_, '_, (&mut Position,)>) {
     for (mut pos,) in query.iter_mut() {
         shuffle_system(&mut pos);
     }
 }
 
-fn increment_system_bevy(mut query: Query<(&mut Position,)>) {
+fn increment_system_bevy(mut query: Query<'_, '_, (&mut Position,)>) {
     for (mut pos,) in query.iter_mut() {
         increment_system(&mut pos);
     }
@@ -99,7 +99,10 @@ mod test {
         }
     }
 
-    fn entities_system(mut query: Query<(&Id, &Position)>, mut entities: ResMut<Entities>) {
+    fn entities_system(
+        mut query: Query<'_, '_, (&Id, &Position)>,
+        mut entities: ResMut<'_, Entities>,
+    ) {
         for (id, pos) in query.iter_mut() {
             entities.0.push((id.clone(), pos.clone()));
         }
